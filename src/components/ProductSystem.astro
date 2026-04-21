@@ -1,0 +1,151 @@
+---
+import Icon from './Icon.astro';
+import { getT } from '../i18n/utils';
+import type { Locale } from '../i18n/translations';
+
+const locale = (Astro.currentLocale ?? 'nb') as Locale;
+const t = getT(locale).products;
+
+const gelMeta = [
+  {
+    image: '/images/gg_gel_1.png',
+    numberColor: '#C8B84A',
+    textColor: '#A99B4A',
+    sectionBg: '#EDEBD1',
+  },
+  {
+    image: '/images/gg_gel_2.png',
+    numberColor: '#5A7DA0',
+    textColor: '#3B5861',
+    sectionBg: '#CEDFE1',
+  },
+  {
+    image: '/images/gg_gel_3.png',
+    numberColor: '#A07050',
+    textColor: '#6B3B23',
+    sectionBg: '#E5D3C3',
+  },
+  {
+    image: '/images/gg_gel_4.png',
+    numberColor: '#6A8E6E',
+    textColor: '#495B43',
+    sectionBg: '#D5E1D0',
+  },
+] as const;
+---
+
+<section id="system" class="bg-parchment">
+  <!-- Section header -->
+  <div class="max-w-5xl mx-auto px-6 pt-20 md:pt-28 pb-16 text-center">
+    <p class="text-muted text-sm tracking-[0.2em] uppercase mb-4">{t.eyebrow}</p>
+    <h2 class="text-ink text-3xl md:text-4xl font-display leading-snug mb-4">{t.title}</h2>
+    <p class="text-muted text-lg max-w-xl mx-auto leading-relaxed">{t.body}</p>
+  </div>
+
+  <!-- Round timeline -->
+  <div class="max-w-4xl mx-auto px-6 pb-16">
+    <div class="relative flex items-start justify-between gap-2">
+      <div class="absolute top-4 left-[12.5%] right-[12.5%] h-px bg-ink/10" aria-hidden="true" />
+
+      {t.gels.map((gel, i) => {
+        const meta = gelMeta[i];
+        return (
+          <div class="flex-1 flex flex-col items-center gap-2 relative z-10">
+            <!-- Dekorativ ring i gelfargen + ink-tall som gir 14.8:1 på bg-ink -->
+            <div
+              class="w-8 h-8 rounded-full bg-ink flex items-center justify-center text-xs font-bold font-sans text-cream"
+              style={`box-shadow: 0 0 0 2px ${meta.numberColor}`}
+            >
+              {i + 1}
+            </div>
+            <div class="text-center hidden sm:block">
+              <p class="text-ink text-xs font-display leading-tight">{gel.name}</p>
+              <p class="text-muted text-xs mt-0.5">{gel.timing}</p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+
+  <!-- Gel feature sections – sentrert vertikal layout -->
+  <div class="relative">
+    <!-- Vertikal tidslinje-linje -->
+    <div class="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-px bg-ink/10 pointer-events-none" aria-hidden="true" />
+
+    {t.gels.map((gel, i) => {
+      const meta = gelMeta[i];
+
+      return (
+        <article class="relative border-t" style={`background-color: ${meta.sectionBg}; border-color: ${meta.textColor}30`}>
+          <div class="max-w-2xl mx-auto px-6 py-12 md:py-16 flex flex-col items-center text-center">
+
+            <!-- Tidslinje-node: nummerert sirkel -->
+            <div
+              class="relative z-10 w-11 h-11 rounded-full bg-ink flex items-center justify-center text-sm font-bold font-sans text-cream mb-3"
+              style={`box-shadow: 0 0 0 3px ${meta.numberColor}60, 0 0 0 7px ${meta.numberColor}18`}
+            >
+              {i + 1}
+            </div>
+
+            <!-- Timing-etikett -->
+            <span class="text-xs font-sans tracking-[0.2em] uppercase text-muted mb-4">{gel.timing}</span>
+
+            <!-- Produktbilde: sentrert -->
+            <div class="group mb-5">
+              <img
+                src={meta.image}
+                alt={gel.name}
+                width="340"
+                height="400"
+                loading={i === 0 ? 'eager' : 'lazy'}
+                decoding="async"
+                class="w-full max-w-[280px] h-auto object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-105"
+              />
+            </div>
+
+            <!-- Produktnavn -->
+            <h3 class="font-display text-4xl md:text-5xl font-medium leading-tight mb-2" style={`color: ${meta.textColor}`}>{gel.name}</h3>
+
+            <!-- Tagline -->
+            <p class="text-base font-sans font-medium mb-5 max-w-sm" style={`color: ${meta.textColor}`}>{gel.tagline}</p>
+
+            <!-- Beskrivelse -->
+            <p class="text-muted leading-relaxed mb-6 max-w-md text-base">{gel.description}</p>
+
+            <!-- Fordeler som pille-chips -->
+            <ul class="flex flex-wrap justify-center gap-2">
+              {gel.benefits.map((b) => (
+                <li
+                  class="flex items-center gap-2 text-sm px-4 py-2 rounded-full"
+                  style={`color: ${meta.textColor}; background-color: ${meta.textColor}12; border: 1px solid ${meta.textColor}30`}
+                >
+                  <span class="flex-shrink-0">
+                    <Icon name="check" size={13} />
+                  </span>
+                  {b}
+                </li>
+              ))}
+            </ul>
+
+          </div>
+        </article>
+      );
+    })}
+  </div>
+
+  <!-- Bottom CTA -->
+  <div class="bg-parchment py-16 text-center border-t border-cream">
+    <p class="text-muted text-sm mb-6">
+      {locale === 'nb'
+        ? 'Alle fire gels inkludert med GG-Clip™'
+        : 'All four gels included with GG-Clip™'}
+    </p>
+    <a
+      href="#venteliste"
+      class="inline-block bg-ink text-cream px-10 py-4 font-sans tracking-wide hover:bg-ink/80 transition-colors duration-200"
+    >
+      {t.ctaLabel} &rarr;
+    </a>
+  </div>
+</section>

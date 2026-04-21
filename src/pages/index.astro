@@ -1,0 +1,35 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import Problem from '../components/Problem.astro';
+import ProductSystem from '../components/ProductSystem.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import FinalCTA from '../components/FinalCTA.astro';
+import WaitlistSection from '../components/WaitlistSection.astro';
+import FAQ from '../components/FAQ.astro';
+import Footer from '../components/Footer.astro';
+import { translations } from '../i18n/translations';
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: translations.nb.faq.items.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+};
+---
+
+<Layout faqSchema={faqSchema}>
+  <main>
+    <Hero />
+    <Problem />
+    <ProductSystem />
+    <HowItWorks />
+    <FinalCTA />
+    <WaitlistSection />
+    <FAQ />
+  </main>
+  <Footer />
+</Layout>

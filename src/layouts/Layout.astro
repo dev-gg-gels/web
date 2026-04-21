@@ -1,0 +1,104 @@
+---
+import { site } from '../config/site';
+import Header from '../components/Header.astro';
+import '../styles/global.css';
+import type { Locale } from '../i18n/translations';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  faqSchema?: object;
+}
+
+const {
+  title = site.title,
+  description = site.description,
+  ogImage = site.ogImage,
+  faqSchema,
+} = Astro.props;
+
+const locale = (Astro.currentLocale ?? 'nb') as Locale;
+const canonicalUrl = new URL(Astro.url.pathname, site.url).toString();
+const ogImageUrl = new URL(ogImage, site.url).toString();
+const htmlLang = locale === 'nb' ? 'nb' : 'en';
+
+// hreflang alternates
+const nbUrl = site.url + '/';
+const enUrl = site.url + '/en/';
+
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: site.name,
+  url: site.url,
+  description,
+  inLanguage: htmlLang,
+};
+
+const productSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: 'GG-Gels',
+  description,
+  brand: { '@type': 'Brand', name: 'GG-Gels' },
+  category: 'Sports Nutrition',
+  offers: {
+    '@type': 'Offer',
+    availability: 'https://schema.org/PreOrder',
+    priceCurrency: 'NOK',
+    url: canonicalUrl,
+  },
+};
+---
+
+<!doctype html>
+<html lang={htmlLang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content={site.themeColor} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- hreflang for bilingual SEO -->
+    <link rel="alternate" hreflang="nb-NO" href={nbUrl} />
+    <link rel="alternate" hreflang="en-GB" href={enUrl} />
+    <link rel="alternate" hreflang="x-default" href={nbUrl} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:alt" content="GG-Gels – energigel for golf" />
+    <meta property="og:image:width" content={String(site.ogImageWidth)} />
+    <meta property="og:image:height" content={String(site.ogImageHeight)} />
+    <meta property="og:locale" content={locale === 'nb' ? 'nb_NO' : 'en_GB'} />
+    <meta property="og:site_name" content={site.name} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content="GG-Gels – energy gel for golf" />
+
+    <!-- Structured data -->
+    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
+    {faqSchema && (
+      <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+    )}
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+  </head>
+  <body class="bg-parchment text-ink antialiased">
+    <Header />
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,12 @@
+---
+interface Props {
+  size?: 'base' | 'xl';
+  class?: string;
+}
+
+const { size = 'base', class: className = '' } = Astro.props;
+---
+
+<span class:list={['font-display font-bold tracking-wide text-cream', size === 'xl' ? 'text-xl' : 'text-base', className]}>
+  GG-Gels
+</span>

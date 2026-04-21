@@ -1,0 +1,36 @@
+---
+import iconNodes from 'lucide-static/icon-nodes.json';
+
+interface Props {
+  name: keyof typeof iconNodes;
+  size?: number;
+  class?: string;
+  'aria-hidden'?: boolean;
+}
+
+const { name, size = 24, class: className = '', 'aria-hidden': ariaHidden = true } = Astro.props;
+
+type NodeAttr = Record<string, string | number>;
+type NodeTuple = [string, NodeAttr];
+
+const nodes = iconNodes[name] as NodeTuple[];
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class={className}
+  aria-hidden={ariaHidden}
+>
+  {nodes.map(([tag, attrs]) => {
+    const Tag = tag;
+    return <Tag {...attrs} />;
+  })}
+</svg>

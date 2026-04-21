@@ -1,0 +1,157 @@
+---
+import { waitlistConfig } from '../config/waitlist';
+import { getT } from '../i18n/utils';
+import type { Locale } from '../i18n/translations';
+
+const locale = (Astro.currentLocale ?? 'nb') as Locale;
+const t = getT(locale).waitlist;
+const { earlyBirdDiscount, maxEarlyBird } = waitlistConfig;
+
+const sectionTitle = t.title.replace('{max}', String(maxEarlyBird));
+const sectionBody = t.body.replace('{discount}', earlyBirdDiscount);
+const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
+---
+
+<section id="venteliste" class="bg-ink py-20 md:py-28">
+  <div class="max-w-2xl mx-auto px-6 text-center">
+    <p class="text-tee text-sm tracking-[0.2em] uppercase mb-4">{t.eyebrow}</p>
+    <h2 class="text-cream font-display text-3xl md:text-4xl leading-snug mb-4">{sectionTitle}</h2>
+    <p class="text-cream/70 text-lg leading-relaxed mb-10">{sectionBody}</p>
+
+    <form id="waitlist-form" class="text-left space-y-5" novalidate>
+      <div>
+        <label for="email" class="block text-cream/80 text-sm mb-2">
+          {t.emailLabel} <span class="text-tee">*</span>
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          required
+          placeholder={t.emailPlaceholder}
+          class="w-full bg-cream/10 border border-cream/20 text-cream placeholder-cream/30 px-4 py-3 focus:outline-none focus:border-tee transition-colors duration-200"
+        />
+      </div>
+
+      <fieldset>
+        <legend class="text-cream/80 text-sm mb-3">{t.handicapLegend}</legend>
+        <div class="grid grid-cols-2 gap-2">
+          {t.handicapOptions.map(({ value, label }) => (
+            <label class="flex items-center gap-3 border border-cream/20 px-4 py-3 cursor-pointer hover:border-cream/40 transition-colors has-[:checked]:border-tee has-[:checked]:bg-tee/10">
+              <input type="radio" name="handicap" value={value} class="accent-tee" />
+              <span class="text-cream/80 text-sm">{label}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="text-cream/80 text-sm mb-3">{t.frequencyLegend}</legend>
+        <div class="grid grid-cols-2 gap-2">
+          {t.frequencyOptions.map(({ value, label }) => (
+            <label class="flex items-center gap-3 border border-cream/20 px-4 py-3 cursor-pointer hover:border-cream/40 transition-colors has-[:checked]:border-tee has-[:checked]:bg-tee/10">
+              <input type="radio" name="frequency" value={value} class="accent-tee" />
+              <span class="text-cream/80 text-sm">{label}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="text-cream/80 text-sm mb-3">{t.painPointLegend}</legend>
+        <div class="space-y-2">
+          {t.painPointOptions.map(({ value, label }) => (
+            <label class="flex items-center gap-3 border border-cream/20 px-4 py-3 cursor-pointer hover:border-cream/40 transition-colors has-[:checked]:border-tee has-[:checked]:bg-tee/10">
+              <input type="radio" name="painPoint" value={value} class="accent-tee" />
+              <span class="text-cream/80 text-sm">{label}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <button
+        type="submit"
+        id="submit-btn"
+        class="w-full bg-tee text-ink font-sans font-bold py-4 tracking-wide hover:bg-yellow-300 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {t.submitLabel}
+      </button>
+
+      <p class="text-cream/40 text-xs text-center">{t.privacyNote}</p>
+    </form>
+
+    <div id="success-message" class="hidden text-center py-8">
+      <div class="text-4xl mb-4">{t.successEmoji}</div>
+      <h3 class="text-cream font-display text-2xl mb-3">{t.successTitle}</h3>
+      <p class="text-cream/70 leading-relaxed">{successBody}</p>
+    </div>
+
+    <div id="error-message" class="hidden mt-4 p-4 border border-red-400/30 bg-red-400/10">
+      <p class="text-red-300 text-sm" set:html={t.errorBody.replace(
+        'hei@gg-gels.no',
+        '<a href="mailto:hei@gg-gels.no" class="underline">hei@gg-gels.no</a>'
+      )} />
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ endpoint: waitlistConfig.endpoint, provider: waitlistConfig.provider, fieldMapping: waitlistConfig.fieldMapping, submitLabel: t.submitLabel, submittingLabel: t.submittingLabel }}>
+  const form = document.getElementById('waitlist-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const successMsg = document.getElementById('success-message');
+  const errorMsg = document.getElementById('error-message');
+
+  if (form && submitBtn && successMsg && errorMsg) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const emailInput = /** @type {HTMLInputElement} */ (document.getElementById('email'));
+      if (!emailInput?.value || !emailInput.validity.valid) {
+        emailInput?.focus();
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = submittingLabel;
+      errorMsg.classList.add('hidden');
+
+      const data = new FormData(form);
+
+      try {
+        let response;
+
+        if (provider === 'google-forms') {
+          const params = new URLSearchParams();
+          if (fieldMapping.email) params.append(fieldMapping.email, data.get('email') ?? '');
+          if (fieldMapping.handicap) params.append(fieldMapping.handicap, data.get('handicap') ?? '');
+          if (fieldMapping.frequency) params.append(fieldMapping.frequency, data.get('frequency') ?? '');
+          if (fieldMapping.painPoint) params.append(fieldMapping.painPoint, data.get('painPoint') ?? '');
+          await fetch(endpoint, { method: 'POST', body: params, mode: 'no-cors' });
+          response = { ok: true };
+        } else {
+          response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({
+              email: data.get('email'),
+              handicap: data.get('handicap'),
+              frequency: data.get('frequency'),
+              painPoint: data.get('painPoint'),
+            }),
+          });
+        }
+
+        if (response.ok) {
+          form.classList.add('hidden');
+          successMsg.classList.remove('hidden');
+        } else {
+          throw new Error('Server error');
+        }
+      } catch {
+        errorMsg.classList.remove('hidden');
+        submitBtn.disabled = false;
+        submitBtn.textContent = submitLabel;
+      }
+    });
+  }
+</script>

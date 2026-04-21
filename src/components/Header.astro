@@ -1,0 +1,65 @@
+---
+import { getT, getLocalePath, getAlternateLocale } from '../i18n/utils';
+import type { Locale } from '../i18n/translations';
+import Logo from './Logo.astro';
+
+const locale = (Astro.currentLocale ?? 'nb') as Locale;
+const t = getT(locale).nav;
+const altLocale = getAlternateLocale(locale);
+const altPath = getLocalePath(altLocale);
+---
+
+<header
+  id="site-header"
+  class="fixed top-0 left-0 right-0 z-50"
+  aria-label="Nettstednavigasjon"
+>
+  <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+    <!-- Logo -->
+    <a
+      href={getLocalePath(locale)}
+      class="flex items-center gap-2 group"
+      aria-label={t.logoAlt}
+    >
+      <Logo class="group-hover:text-tee transition-colors duration-200" />
+    </a>
+
+    <!-- Right side -->
+    <div class="flex items-center gap-5">
+      <!-- Language switcher -->
+      <a
+        href={altPath}
+        class="text-cream/60 hover:text-cream text-sm font-sans tracking-wide transition-colors duration-200 flex items-center gap-1.5"
+        aria-label={`Switch to ${t.langSwitch}`}
+        hreflang={altLocale === 'nb' ? 'nb-NO' : 'en-GB'}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+          <path d="M2 12h20"/>
+        </svg>
+        {t.langSwitch}
+      </a>
+
+      <!-- CTA button -->
+      <a
+        href="#venteliste"
+        class="hidden sm:inline-flex items-center bg-tee/90 text-ink text-sm font-sans font-bold px-4 py-2 hover:bg-tee transition-colors duration-200"
+      >
+        {t.ctaLabel}
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- Offset for fixed header so hero is not hidden underneath -->
+<div class="h-16" aria-hidden="true" />
+
+<style>
+  #site-header {
+    background: rgba(31, 30, 26, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+</style>

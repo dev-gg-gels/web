@@ -1,0 +1,53 @@
+---
+import { Image } from 'astro:assets';
+import backGrass from '../../public/images/back-grass.jpg';
+import Icon from './Icon.astro';
+import { getT } from '../i18n/utils';
+import type { Locale } from '../i18n/translations';
+
+const locale = (Astro.currentLocale ?? 'nb') as Locale;
+const t = getT(locale).problem;
+
+const icons = ['zap', 'brain', 'banana'] as const;
+---
+
+<section class="bg-cream py-20 md:py-28">
+  <div class="max-w-5xl mx-auto px-6">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      <div>
+        <p class="text-muted text-sm tracking-[0.2em] uppercase mb-4">{t.eyebrow}</p>
+        <h2 class="text-ink text-3xl md:text-4xl font-display leading-snug mb-8">{t.title}</h2>
+
+        <div class="space-y-8">
+          {t.items.map((item, i) => (
+            <div class="flex gap-4">
+              <span class="text-tee flex-shrink-0 mt-1">
+                <Icon name={icons[i]} size={22} />
+              </span>
+              <div>
+                <h3 class="font-display text-lg text-ink mb-1">{item.title}</h3>
+                <p class="text-muted leading-relaxed">{item.body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div class="mt-10 p-5 border-l-2 border-tee bg-parchment">
+          <p class="text-ink italic leading-relaxed">{t.quoteText}</p>
+          <p class="text-muted text-sm mt-2">{t.quoteSource}</p>
+        </div>
+      </div>
+
+      <div class="relative">
+        <Image
+          src={backGrass}
+          alt={t.imageAlt}
+          class="w-full object-cover aspect-[3/4]"
+          widths={[400, 700]}
+          sizes="(max-width: 768px) 100vw, 50vw"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-ink/20 to-transparent" />
+      </div>
+    </div>
+  </div>
+</section>

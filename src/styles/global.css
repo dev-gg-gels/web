@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #F4EEE2;
+  --color-parchment: #FAF6EC;
+  --color-ink: #1F1E1A;
+  --color-muted: #6B6355;
+  --color-tee: #C8B84A;
+  --color-front: #5A7DA0;
+  --color-clutch: #A07050;
+  --color-putt: #6A8E6E;
+
+  --font-family-sans: Georgia, Cambria, "Times New Roman", serif;
+  --font-family-display: Georgia, Cambria, serif;
+}

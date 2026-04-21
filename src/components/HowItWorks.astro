@@ -1,0 +1,41 @@
+---
+import { Image } from 'astro:assets';
+import teeHand from '../../public/images/tee-hand.jpg';
+import frontPocket from '../../public/images/front-pocket.jpg';
+import fourOnBag from '../../public/images/four-on-bag.jpg';
+import { getT } from '../i18n/utils';
+import type { Locale } from '../i18n/translations';
+
+const locale = (Astro.currentLocale ?? 'nb') as Locale;
+const t = getT(locale).howItWorks;
+
+const images = [fourOnBag, teeHand, frontPocket];
+---
+
+<section class="bg-cream py-20 md:py-28">
+  <div class="max-w-5xl mx-auto px-6">
+    <div class="text-center mb-14">
+      <p class="text-muted text-sm tracking-[0.2em] uppercase mb-4">{t.eyebrow}</p>
+      <h2 class="text-ink text-3xl md:text-4xl font-display leading-snug">{t.title}</h2>
+    </div>
+
+    <div class="space-y-16 md:space-y-0 md:grid md:grid-cols-3 md:gap-8">
+      {t.steps.map((step, i) => (
+        <div class="flex flex-col">
+          <div class="aspect-4/3 overflow-hidden mb-6">
+            <Image
+              src={images[i]}
+              alt={step.imageAlt}
+              class="w-full h-full object-cover"
+              widths={[300, 500]}
+              sizes="(max-width: 768px) 100vw, 33vw"
+            />
+          </div>
+          <p class="text-ink font-sans text-sm font-bold tracking-widest mb-2">{step.label}</p>
+          <h3 class="font-display text-xl text-ink mb-3">{step.title}</h3>
+          <p class="text-muted leading-relaxed text-sm">{step.body}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

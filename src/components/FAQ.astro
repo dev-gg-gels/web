@@ -1,0 +1,41 @@
+---
+import Icon from './Icon.astro';
+import { getT } from '../i18n/utils';
+import type { Locale } from '../i18n/translations';
+
+const locale = (Astro.currentLocale ?? 'nb') as Locale;
+const t = getT(locale).faq;
+---
+
+<section class="bg-parchment py-20 md:py-28">
+  <div class="max-w-2xl mx-auto px-6">
+    <div class="text-center mb-12">
+      <p class="text-muted text-sm tracking-[0.2em] uppercase mb-4">{t.eyebrow}</p>
+      <h2 class="text-ink text-3xl md:text-4xl font-display">{t.title}</h2>
+    </div>
+
+    <div class="space-y-0 divide-y divide-cream">
+      {t.items.map((faq, i) => (
+        <details class="group py-5" open={i === 0}>
+          <summary class="flex items-center justify-between cursor-pointer list-none gap-4">
+            <span class="font-display text-ink text-lg pr-4">{faq.question}</span>
+            <span class="text-muted flex-shrink-0 transition-transform duration-200">
+              <Icon name="plus" size={18} class="group-open:hidden" />
+              <Icon name="minus" size={18} class="hidden group-open:block" />
+            </span>
+          </summary>
+          <p class="text-muted leading-relaxed mt-4 text-sm">{faq.answer}</p>
+        </details>
+      ))}
+    </div>
+
+    <div class="mt-12 text-center">
+      <p class="text-muted text-sm">
+        {t.contactPrompt}{' '}
+        <a href="mailto:hei@gg-gels.no" class="text-ink underline hover:text-muted transition-colors">
+          {t.contactLabel}
+        </a>
+      </p>
+    </div>
+  </div>
+</section>
