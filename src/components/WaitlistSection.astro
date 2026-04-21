@@ -95,7 +95,7 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
   </div>
 </section>
 
-<script define:vars={{ endpoint: waitlistConfig.endpoint, provider: waitlistConfig.provider, fieldMapping: waitlistConfig.fieldMapping, submitLabel: t.submitLabel, submittingLabel: t.submittingLabel }}>
+<script define:vars={{ endpoint: waitlistConfig.endpoint, provider: waitlistConfig.provider, fieldMapping: waitlistConfig.fieldMapping, mailerlite: waitlistConfig.mailerlite, submitLabel: t.submitLabel, submittingLabel: t.submittingLabel }}>
   const form = document.getElementById('waitlist-form');
   const submitBtn = document.getElementById('submit-btn');
   const successMsg = document.getElementById('success-message');
@@ -120,7 +120,16 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
       try {
         let response;
 
-        if (provider === 'google-forms') {
+        if (provider === 'mailerlite') {
+          const url = `https://assets.mailerlite.com/jsonp/${mailerlite.accountId}/forms/${mailerlite.formId}/subscribe`;
+          const params = new URLSearchParams();
+          params.append('fields[email]', data.get('email') ?? '');
+          params.append('fields[handicap]', data.get('handicap') ?? '');
+          params.append('fields[frequency]', data.get('frequency') ?? '');
+          params.append('fields[pain_point]', data.get('painPoint') ?? '');
+          await fetch(url, { method: 'POST', body: params, mode: 'no-cors' });
+          response = { ok: true };
+        } else if (provider === 'google-forms') {
           const params = new URLSearchParams();
           if (fieldMapping.email) params.append(fieldMapping.email, data.get('email') ?? '');
           if (fieldMapping.handicap) params.append(fieldMapping.handicap, data.get('handicap') ?? '');

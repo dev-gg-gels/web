@@ -1,37 +1,42 @@
 ---
+import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
 import { getT } from '../i18n/utils';
 import type { Locale } from '../i18n/translations';
+import gel1 from '../../public/images/gg_gel_1.png';
+import gel2 from '../../public/images/gg_gel_2.png';
+import gel3 from '../../public/images/gg_gel_3.png';
+import gel4 from '../../public/images/gg_gel_4.png';
 
 const locale = (Astro.currentLocale ?? 'nb') as Locale;
 const t = getT(locale).products;
 
 const gelMeta = [
   {
-    image: '/images/gg_gel_1.png',
+    image: gel1,
     numberColor: '#C8B84A',
     textColor: '#A99B4A',
     sectionBg: '#EDEBD1',
   },
   {
-    image: '/images/gg_gel_2.png',
+    image: gel2,
     numberColor: '#5A7DA0',
     textColor: '#3B5861',
     sectionBg: '#CEDFE1',
   },
   {
-    image: '/images/gg_gel_3.png',
+    image: gel3,
     numberColor: '#A07050',
     textColor: '#6B3B23',
     sectionBg: '#E5D3C3',
   },
   {
-    image: '/images/gg_gel_4.png',
+    image: gel4,
     numberColor: '#6A8E6E',
     textColor: '#495B43',
     sectionBg: '#D5E1D0',
   },
-] as const;
+];
 ---
 
 <section id="system" class="bg-parchment">
@@ -93,13 +98,13 @@ const gelMeta = [
 
             <!-- Produktbilde: sentrert -->
             <div class="group mb-5">
-              <img
+              <Image
                 src={meta.image}
                 alt={gel.name}
-                width="340"
-                height="400"
+                width={340}
+                height={400}
                 loading={i === 0 ? 'eager' : 'lazy'}
-                decoding="async"
+                format="avif"
                 class="w-full max-w-[280px] h-auto object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-105"
               />
             </div>

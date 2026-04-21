@@ -13,7 +13,7 @@ export const translations = {
       eyebrow: 'Din ernæringscaddy',
       title: 'Energi som matcher runden.\nHull for hull.',
       body: 'Ikke én generisk sportsgel – et system av fire gels designet for golfens fire faser. Fra første tee til siste putt.',
-      ctaPrimary: 'Kom deg på ventelisten',
+      ctaPrimary: 'Meld deg på ventelisten',
       ctaSecondary: 'Se produktet',
       earlyBirdNote: 'Begrenset early bird-tilgang · 20% rabatt til de første 500',
     },
@@ -60,13 +60,13 @@ export const translations = {
           timing: 'Rundt hull 4–5',
           tagline: 'Hold nivået oppe',
           description:
-            'Fyller opp glukoselagrene på midtpunktet uten å ødelegge konsentrasjonen. Ren karbohydratboost som holder deg skjerpet gjennom front 9.',
+            'Fyller opp glukoselagrene i forkant av midtpunktet uten å ødelegge konsentrasjonen. Ren karbohydratboost som holder deg skjerpet gjennom front 9.',
           benefits: ['Stabil blodsukker', 'Ingen trøtthet', 'Vedvarende rytme'],
         },
         {
           name: 'Back 9 Clutch',
           timing: 'Rundt hull 10–11',
-          tagline: 'Møt veggen halvveis',
+          tagline: 'Full kraft fra hull 10',
           description:
             'Akkurat der energien pleier å svikte – et kraftig løft av fokus og utholdenhet. Ekstra L-theanin for å holde presisjonsnivået oppe når kroppen begynner å gi etter.',
           benefits: ['Motvirker utmattelse', 'Presisjon under press', 'Mentalt løft'],
@@ -265,13 +265,13 @@ export const translations = {
           timing: 'Around holes 4–5',
           tagline: 'Keep your level up',
           description:
-            'Tops up glucose stores at the midpoint without disrupting concentration. A clean carbohydrate boost that keeps you sharp through the front 9.',
+            'Tops up glucose stores before the midpoint without disrupting concentration. A clean carbohydrate boost that keeps you sharp through the front 9.',
           benefits: ['Stable blood sugar', 'No fatigue', 'Sustained rhythm'],
         },
         {
           name: 'Back 9 Clutch',
           timing: 'Around holes 10–11',
-          tagline: 'Hit the wall early',
+          tagline: 'Full power from hole 10',
           description:
             'Right where energy usually fails – a powerful boost of focus and endurance. Extra L-theanine to maintain precision when your body starts to fade.',
           benefits: ['Fights fatigue', 'Precision under pressure', 'Mental lift'],
@@ -371,7 +371,7 @@ export const translations = {
         {
           question: 'Why four gels and not just one?',
           answer:
-            'A golf round lasts 4–5 hours with very varying demands. You need focus and energy on the tee, steady blood sugar through the front 9, a boost towards the end, and composure in your fine motor skills on the final holes. One gel cannot do all of this – it\'s a system.',
+            'A golf round lasts 4–5 hours with highly variable demands. You need focus and energy on the tee, steady blood sugar through the front 9, a boost towards the end, and composure in your fine motor skills on the final holes. One gel cannot do all of this – it\'s a system.',
         },
         {
           question: 'Does caffeine harm putting precision?',

@@ -9,8 +9,8 @@ import { MOBILE_MEDIA } from '../utils/breakpoints';
 const locale = (Astro.currentLocale ?? 'nb') as Locale;
 const t = getT(locale).hero;
 
-const desktopImg = await getImage({ src: heroWide, widths: [1024, 1440], sizes: '100vw' });
-const mobileImg = await getImage({ src: heroWideMobile, widths: [390, 640], sizes: '100vw' });
+const desktopImg = await getImage({ src: heroWide, widths: [1024, 1440], sizes: '100vw', format: 'avif' });
+const mobileImg = await getImage({ src: heroWideMobile, widths: [390, 640], sizes: '100vw', format: 'avif' });
 ---
 
 <section class="relative min-h-[90vh] flex items-center overflow-hidden bg-ink">
