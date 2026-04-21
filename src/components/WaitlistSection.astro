@@ -7,10 +7,14 @@ const locale = (Astro.currentLocale ?? 'nb') as Locale;
 const t = getT(locale).waitlist;
 const { earlyBirdDiscount, maxEarlyBird } = waitlistConfig;
 
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? '';
+
 const sectionTitle = t.title.replace('{max}', String(maxEarlyBird));
 const sectionBody = t.body.replace('{discount}', earlyBirdDiscount);
 const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
 ---
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer is:inline></script>
 
 <section id="venteliste" class="bg-ink py-20 md:py-28">
   <div class="max-w-2xl mx-auto px-6 text-center">
@@ -69,6 +73,10 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
         </div>
       </fieldset>
 
+      <div class="flex justify-center">
+        <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="dark"></div>
+      </div>
+
       <button
         type="submit"
         id="submit-btn"
@@ -95,7 +103,7 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
   </div>
 </section>
 
-<script define:vars={{ endpoint: waitlistConfig.endpoint, provider: waitlistConfig.provider, fieldMapping: waitlistConfig.fieldMapping, mailerlite: waitlistConfig.mailerlite, submitLabel: t.submitLabel, submittingLabel: t.submittingLabel }}>
+<script define:vars={{ submitLabel: t.submitLabel, submittingLabel: t.submittingLabel }}>
   const form = document.getElementById('waitlist-form');
   const submitBtn = document.getElementById('submit-btn');
   const successMsg = document.getElementById('success-message');
@@ -111,44 +119,30 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
         return;
       }
 
+      const data = new FormData(form);
+      const turnstileToken = data.get('cf-turnstile-response');
+
+      if (!turnstileToken) {
+        errorMsg.classList.remove('hidden');
+        return;
+      }
+
       submitBtn.disabled = true;
       submitBtn.textContent = submittingLabel;
       errorMsg.classList.add('hidden');
 
-      const data = new FormData(form);
-
       try {
-        let response;
-
-        if (provider === 'mailerlite') {
-          const url = `https://assets.mailerlite.com/jsonp/${mailerlite.accountId}/forms/${mailerlite.formId}/subscribe`;
-          const params = new URLSearchParams();
-          params.append('fields[email]', data.get('email') ?? '');
-          params.append('fields[handicap]', data.get('handicap') ?? '');
-          params.append('fields[frequency]', data.get('frequency') ?? '');
-          params.append('fields[pain_point]', data.get('painPoint') ?? '');
-          await fetch(url, { method: 'POST', body: params, mode: 'no-cors' });
-          response = { ok: true };
-        } else if (provider === 'google-forms') {
-          const params = new URLSearchParams();
-          if (fieldMapping.email) params.append(fieldMapping.email, data.get('email') ?? '');
-          if (fieldMapping.handicap) params.append(fieldMapping.handicap, data.get('handicap') ?? '');
-          if (fieldMapping.frequency) params.append(fieldMapping.frequency, data.get('frequency') ?? '');
-          if (fieldMapping.painPoint) params.append(fieldMapping.painPoint, data.get('painPoint') ?? '');
-          await fetch(endpoint, { method: 'POST', body: params, mode: 'no-cors' });
-          response = { ok: true };
-        } else {
-          response = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            body: JSON.stringify({
-              email: data.get('email'),
-              handicap: data.get('handicap'),
-              frequency: data.get('frequency'),
-              painPoint: data.get('painPoint'),
-            }),
-          });
-        }
+        const response = await fetch('/api/waitlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            email: data.get('email'),
+            handicap: data.get('handicap'),
+            frequency: data.get('frequency'),
+            painPoint: data.get('painPoint'),
+            turnstileToken,
+          }),
+        });
 
         if (response.ok) {
           form.classList.add('hidden');
@@ -160,6 +154,7 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
         errorMsg.classList.remove('hidden');
         submitBtn.disabled = false;
         submitBtn.textContent = submitLabel;
+        if (globalThis.turnstile) globalThis.turnstile.reset();
       }
     });
   }
