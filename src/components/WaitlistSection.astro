@@ -62,16 +62,81 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
       </fieldset>
 
       <fieldset>
-        <legend class="text-cream/80 text-sm mb-3">{t.painPointLegend}</legend>
-        <div class="space-y-2">
-          {t.painPointOptions.map(({ value, label }) => (
+        <legend class="text-cream/80 text-sm mb-3">{t.currentSolutionLegend}</legend>
+        <div class="grid grid-cols-2 gap-2">
+          {t.currentSolutionOptions.map(({ value, label }) => (
             <label class="flex items-center gap-3 border border-cream/20 px-4 py-3 cursor-pointer hover:border-cream/40 transition-colors has-[:checked]:border-tee has-[:checked]:bg-tee/10">
-              <input type="radio" name="painPoint" value={value} class="accent-tee" />
+              <input type="radio" name="currentSolution" value={value} class="accent-tee" />
               <span class="text-cream/80 text-sm">{label}</span>
             </label>
           ))}
         </div>
       </fieldset>
+
+      <fieldset>
+        <legend class="text-cream/80 text-sm mb-3">
+          {t.prioritiesLegend} <span class="text-cream/40">({t.prioritiesHint})</span>
+        </legend>
+        <div class="grid grid-cols-2 gap-2">
+          {t.prioritiesOptions.map(({ value, label }) => (
+            <label class="flex items-center gap-3 border border-cream/20 px-4 py-3 cursor-pointer hover:border-cream/40 transition-colors has-[:checked]:border-tee has-[:checked]:bg-tee/10">
+              <input type="checkbox" name="priorities" value={value} class="accent-tee" />
+              <span class="text-cream/80 text-sm">{label}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="text-cream/80 text-sm mb-3">{t.priceLegend}</legend>
+        <div class="grid grid-cols-2 gap-2">
+          {t.priceOptions.map(({ value, label }) => (
+            <label class="flex items-center gap-3 border border-cream/20 px-4 py-3 cursor-pointer hover:border-cream/40 transition-colors has-[:checked]:border-tee has-[:checked]:bg-tee/10">
+              <input type="radio" name="priceWillingness" value={value} class="accent-tee" />
+              <span class="text-cream/80 text-sm">{label}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="text-cream/80 text-sm mb-3">{t.attributionLegend}</legend>
+        <div class="grid grid-cols-2 gap-2">
+          {t.attributionOptions.map(({ value, label }) => (
+            <label class="flex items-center gap-3 border border-cream/20 px-4 py-3 cursor-pointer hover:border-cream/40 transition-colors has-[:checked]:border-tee has-[:checked]:bg-tee/10">
+              <input type="radio" name="attribution" value={value} class="accent-tee" />
+              <span class="text-cream/80 text-sm">{label}</span>
+            </label>
+          ))}
+        </div>
+        <div id="attribution-other-wrapper" class="hidden mt-3">
+          <label for="attribution-other" class="block text-cream/80 text-sm mb-2">
+            {t.attributionOtherLabel} <span class="text-tee">*</span>
+          </label>
+          <input
+            type="text"
+            id="attribution-other"
+            name="attributionOther"
+            maxlength="200"
+            placeholder={t.attributionOtherPlaceholder}
+            class="w-full bg-cream/10 border border-cream/20 text-cream placeholder-cream/30 px-4 py-3 focus:outline-none focus:border-tee transition-colors duration-200"
+          />
+        </div>
+      </fieldset>
+
+      <div>
+        <label for="club" class="block text-cream/80 text-sm mb-2">
+          {t.clubLabel} <span class="text-cream/40">({t.clubHint})</span>
+        </label>
+        <input
+          type="text"
+          id="club"
+          name="club"
+          maxlength="100"
+          placeholder={t.clubPlaceholder}
+          class="w-full bg-cream/10 border border-cream/20 text-cream placeholder-cream/30 px-4 py-3 focus:outline-none focus:border-tee transition-colors duration-200"
+        />
+      </div>
 
       <div class="flex justify-center">
         <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="dark"></div>
@@ -109,6 +174,21 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
   const successMsg = document.getElementById('success-message');
   const errorMsg = document.getElementById('error-message');
 
+  const attributionOtherWrapper = document.getElementById('attribution-other-wrapper');
+  const attributionOtherInput = /** @type {HTMLInputElement | null} */ (
+    document.getElementById('attribution-other')
+  );
+  document.querySelectorAll('input[name="attribution"]').forEach((radio) => {
+    radio.addEventListener('change', () => {
+      const checked = /** @type {HTMLInputElement | null} */ (
+        document.querySelector('input[name="attribution"]:checked')
+      );
+      const isOther = checked?.value === 'other';
+      attributionOtherWrapper?.classList.toggle('hidden', !isOther);
+      if (!isOther && attributionOtherInput) attributionOtherInput.value = '';
+    });
+  });
+
   if (form && submitBtn && successMsg && errorMsg) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -120,6 +200,12 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
       }
 
       const data = new FormData(form);
+
+      if (data.get('attribution') === 'other' && !String(data.get('attributionOther') || '').trim()) {
+        attributionOtherInput?.focus();
+        return;
+      }
+
       const turnstileToken = data.get('cf-turnstile-response');
 
       if (!turnstileToken) {
@@ -139,7 +225,12 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
             email: data.get('email'),
             handicap: data.get('handicap'),
             frequency: data.get('frequency'),
-            painPoint: data.get('painPoint'),
+            currentSolution: data.get('currentSolution'),
+            priorities: data.getAll('priorities'),
+            priceWillingness: data.get('priceWillingness'),
+            attribution: data.get('attribution'),
+            attributionOther: data.get('attributionOther'),
+            club: data.get('club'),
             turnstileToken,
           }),
         });

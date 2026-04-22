@@ -6,7 +6,12 @@ interface WaitlistPayload {
   email: string;
   handicap: string;
   frequency: string;
-  painPoint: string;
+  currentSolution: string;
+  priorities: string[];
+  priceWillingness: string;
+  attribution: string;
+  attributionOther: string;
+  club: string;
   turnstileToken: string;
 }
 
@@ -41,7 +46,12 @@ async function verifyTurnstile(token: string, secret: string, ip: string | null)
 async function insertSupabase(
   env: Pick<Env, 'SUPABASE_URL' | 'SUPABASE_SERVICE_ROLE_KEY'>,
   payload: Omit<WaitlistPayload, 'turnstileToken'>,
+  environment: 'production' | 'test',
 ) {
+  const priorities = Array.isArray(payload.priorities)
+    ? payload.priorities.filter((p): p is string => typeof p === 'string').slice(0, 10)
+    : [];
+
   const res = await fetch(`${env.SUPABASE_URL}/rest/v1/waitlist`, {
     method: 'POST',
     headers: {
@@ -54,7 +64,14 @@ async function insertSupabase(
       email: payload.email,
       handicap: payload.handicap || null,
       frequency: payload.frequency || null,
-      pain_point: payload.painPoint || null,
+      current_solution: payload.currentSolution || null,
+      priorities: priorities.length ? priorities : null,
+      price_willingness: payload.priceWillingness || null,
+      attribution: payload.attribution || null,
+      attribution_other:
+        payload.attribution === 'other' ? payload.attributionOther?.trim() || null : null,
+      club: payload.club?.trim() || null,
+      environment,
     }),
   });
 
@@ -126,8 +143,12 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
     return jsonResponse({ error: 'turnstile_failed' }, 403);
   }
 
+  const hostname = new URL(request.url).hostname;
+  const environment: 'production' | 'test' =
+    hostname === 'gg-gels.no' || hostname === 'www.gg-gels.no' ? 'production' : 'test';
+
   try {
-    await insertSupabase(env, payload);
+    await insertSupabase(env, payload, environment);
   } catch (err) {
     console.error(err);
     return jsonResponse({ error: 'storage_failed' }, 500);
