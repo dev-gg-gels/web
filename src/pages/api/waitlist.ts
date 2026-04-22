@@ -54,7 +54,7 @@ const waitlistSchema = z
     club: z.string().max(CLUB_MAX).optional().nullable(),
     consent: z.literal(true),
     locale: z.enum(['nb', 'en']),
-    turnstileToken: z.string().min(1),
+    turnstileToken: z.string().min(1).max(2048),
   })
   .superRefine((data, ctx) => {
     if (data.attribution === 'other' && !data.attributionOther?.trim()) {
@@ -91,7 +91,17 @@ const jsonResponse = (data: unknown, status = 200) =>
 
 class DuplicateEmailError extends Error {}
 
-async function verifyTurnstile(token: string, secret: string, ip: string | null) {
+interface TurnstileVerifyResult {
+  ok: boolean;
+  hostname?: string;
+  errorCodes?: string[];
+}
+
+async function verifyTurnstile(
+  token: string,
+  secret: string,
+  ip: string | null,
+): Promise<TurnstileVerifyResult> {
   const body = new URLSearchParams({ secret, response: token });
   if (ip) body.append('remoteip', ip);
 
@@ -99,8 +109,16 @@ async function verifyTurnstile(token: string, secret: string, ip: string | null)
     method: 'POST',
     body,
   });
-  const data = (await res.json()) as { success: boolean };
-  return data.success === true;
+  const data = (await res.json()) as {
+    success: boolean;
+    hostname?: string;
+    'error-codes'?: string[];
+  };
+  return {
+    ok: data.success === true,
+    hostname: data.hostname,
+    errorCodes: data['error-codes'],
+  };
 }
 
 async function insertSupabase(
@@ -317,16 +335,25 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   }
   const data = parsed.data;
 
-  const turnstileOk = await verifyTurnstile(
+  const hostname = new URL(request.url).hostname;
+
+  const turnstile = await verifyTurnstile(
     data.turnstileToken,
     env.TURNSTILE_SECRET_KEY,
     clientAddress ?? null,
   );
-  if (!turnstileOk) {
+  if (!turnstile.ok) {
+    console.warn('turnstile_failed', { errorCodes: turnstile.errorCodes });
+    return jsonResponse({ error: 'turnstile_failed' }, 403);
+  }
+  if (turnstile.hostname && turnstile.hostname !== hostname) {
+    console.warn('turnstile_hostname_mismatch', {
+      expected: hostname,
+      actual: turnstile.hostname,
+    });
     return jsonResponse({ error: 'turnstile_failed' }, 403);
   }
 
-  const hostname = new URL(request.url).hostname;
   const environment: 'production' | 'test' =
     hostname === 'gg-gels.no' || hostname === 'www.gg-gels.no' ? 'production' : 'test';
 
