@@ -13,3 +13,18 @@
   --font-family-sans: Georgia, Cambria, "Times New Roman", serif;
   --font-family-display: Georgia, Cambria, serif;
 }
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  summary,
+  label:has(input[type="radio"]),
+  label:has(input[type="checkbox"]) {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}

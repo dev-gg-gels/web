@@ -18,7 +18,7 @@ const altPath = getLocalePath(altLocale);
     <!-- Logo -->
     <a
       href={getLocalePath(locale)}
-      class="flex items-center gap-2 group"
+      class="flex items-center gap-2 group focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-tee"
       aria-label={t.logoAlt}
     >
       <Logo class="group-hover:text-tee transition-colors duration-200" />
@@ -29,7 +29,7 @@ const altPath = getLocalePath(altLocale);
       <!-- Language switcher -->
       <a
         href={altPath}
-        class="text-cream/60 hover:text-cream text-sm font-sans tracking-wide transition-colors duration-200 flex items-center gap-1.5"
+        class="text-cream/60 hover:text-cream text-sm font-sans tracking-wide transition-colors duration-200 flex items-center gap-1.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tee"
         aria-label={`Switch to ${t.langSwitch}`}
         hreflang={altLocale === 'nb' ? 'nb-NO' : 'en-GB'}
       >
@@ -44,7 +44,7 @@ const altPath = getLocalePath(altLocale);
       <!-- CTA button -->
       <a
         href="#venteliste"
-        class="hidden sm:inline-flex items-center bg-tee/90 text-ink text-sm font-sans font-bold px-4 py-2 hover:bg-tee transition-colors duration-200"
+        class="hidden sm:inline-flex items-center bg-tee/90 text-ink text-sm font-sans font-bold px-4 py-2 hover:bg-tee transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cream"
       >
         {t.ctaLabel}
       </a>

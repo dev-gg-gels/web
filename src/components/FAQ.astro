@@ -17,7 +17,7 @@ const t = getT(locale).faq;
     <div class="space-y-0 divide-y divide-cream">
       {t.items.map((faq, i) => (
         <details class="group py-5" open={i === 0}>
-          <summary class="flex items-center justify-between cursor-pointer list-none gap-4">
+          <summary class="flex items-center justify-between cursor-pointer list-none gap-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink rounded-sm">
             <span class="font-display text-ink text-lg pr-4">{faq.question}</span>
             <span class="text-muted flex-shrink-0 transition-transform duration-200">
               <Icon name="plus" size={18} class="group-open:hidden" />
@@ -32,7 +32,7 @@ const t = getT(locale).faq;
     <div class="mt-12 text-center">
       <p class="text-muted text-sm">
         {t.contactPrompt}{' '}
-        <a href="mailto:hei@gg-gels.no" class="text-ink underline hover:text-muted transition-colors">
+        <a href="mailto:hei@gg-gels.no" class="text-ink underline hover:text-muted transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">
           {t.contactLabel}
         </a>
       </p>

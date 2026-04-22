@@ -18,16 +18,16 @@ const copyright = t.copyright.replace('{year}', String(new Date().getFullYear())
       </div>
 
       <div class="flex flex-col sm:flex-row gap-6 text-sm">
-        <a href={`mailto:${site.email}`} class="hover:text-cream transition-colors">
+        <a href={`mailto:${site.email}`} class="hover:text-cream transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tee">
           {t.email}
         </a>
-        <a href={site.instagram} class="hover:text-cream transition-colors" target="_blank" rel="noopener noreferrer">
+        <a href={site.instagram} class="hover:text-cream transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tee" target="_blank" rel="noopener noreferrer">
           {t.instagramLabel}
         </a>
-        <a href="#venteliste" class="hover:text-cream transition-colors">
+        <a href="#venteliste" class="hover:text-cream transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tee">
           {t.waitlistLabel}
         </a>
-        <a href={t.privacyHref} class="hover:text-cream transition-colors">
+        <a href={t.privacyHref} class="hover:text-cream transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tee">
           {t.privacyLabel}
         </a>
       </div>
