@@ -184,7 +184,7 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
   </div>
 </section>
 
-<script define:vars={{ submitLabel: t.submitLabel, submittingLabel: t.submittingLabel }}>
+<script define:vars={{ submitLabel: t.submitLabel, submittingLabel: t.submittingLabel, locale }}>
   const form = document.getElementById('waitlist-form');
   const submitBtn = document.getElementById('submit-btn');
   const successMsg = document.getElementById('success-message');
@@ -259,6 +259,7 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
             attributionOther: data.get('attributionOther'),
             club: data.get('club'),
             consent: true,
+            locale,
             turnstileToken,
           }),
         });
