@@ -25,6 +25,8 @@ alter table public.waitlist add column if not exists priorities text[];
 alter table public.waitlist add column if not exists attribution_other text;
 alter table public.waitlist add column if not exists locale text not null default 'nb';
 
+alter table public.waitlist drop column if exists pain_point;
+
 -- Row Level Security: lock down the table so only the service role can touch it.
 -- The API route uses the service role key server-side (bypasses RLS), so RLS stays on
 -- and an explicit deny policy makes the intent clear to Supabase's linter.
