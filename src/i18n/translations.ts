@@ -182,6 +182,9 @@ export const translations = {
       successTitle: 'Du er med på listen!',
       successBody:
         'Vi sender deg en e-post med mer informasjon og {discount} rabattkode når vi er klare til lansering.',
+      alreadyRegisteredTitle: 'Du er allerede på listen',
+      alreadyRegisteredBody:
+        'E-posten din er registrert fra før — plassen din er trygg. Sjekk innboksen din etter den første bekreftelsen, eller ta kontakt på hei@gg-gels.no hvis du ikke finner den.',
       errorBody:
         'Noe gikk galt. Prøv igjen, eller send oss en e-post på hei@gg-gels.no.',
     },
@@ -423,6 +426,9 @@ export const translations = {
       successTitle: 'You\'re on the list!',
       successBody:
         'We\'ll send you an email with more information and your {discount} discount code when we\'re ready to launch.',
+      alreadyRegisteredTitle: 'You\'re already on the list',
+      alreadyRegisteredBody:
+        'This email is already registered — your spot is safe. Check your inbox for the original confirmation, or email hei@gg-gels.no if you can\'t find it.',
       errorBody:
         'Something went wrong. Please try again, or email us at hei@gg-gels.no.',
     },

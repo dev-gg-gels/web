@@ -18,6 +18,7 @@ Landingsside for GG-Gels med venteliste-innmelding. Astro 6 (SSR) på Cloudflare
    - Validerer e-post og at samtykke-checkboksen er huket av (`consent === true`)
    - Verifiserer Turnstile-token
    - Skriver raden til Supabase via REST (service role key), inkludert `locale` (`nb` / `en`) for senere språk-riktig kommunikasjon
+   - Duplikat-e-post fanges av unique-constraint i `waitlist`-tabellen: Postgres-feil `23505` → 409 `already_registered`. Frontend viser eget panel ("du er allerede på listen"), og bekreftelsesmail sendes **ikke** på nytt (hindrer misbruk)
    - Sender lokalisert bekreftelses-e-post via Resend (feiler stille — innmeldingen er uansett lagret)
 
 Personvernerklæring ligger på [`/personvern`](src/pages/personvern.astro) og [`/en/privacy`](src/pages/en/privacy.astro), lenket fra footer og fra samtykke-checkboksen.
@@ -30,8 +31,9 @@ Personvernerklæring ligger på [`/personvern`](src/pages/personvern.astro) og [
 | `pnpm dev` | Dev-server på `localhost:4321` |
 | `pnpm build` | Bygg til `./dist/` |
 | `pnpm preview` | Preview bygget lokalt |
+| `pnpm check` | Type- og diagnostikk-sjekk av Astro- og TS-filer (kjører `wrangler types` først) |
 | `pnpm deploy` | Build + deploy til Cloudflare i én kommando |
-| `pnpm generate-types` | Generer Cloudflare bindings-typer manuelt (kalles automatisk av `dev`/`build`) |
+| `pnpm generate-types` | Generer Cloudflare bindings-typer manuelt (kalles automatisk av `dev`/`build`/`check`) |
 
 ## Førstegangs-oppsett
 

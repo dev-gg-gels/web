@@ -175,6 +175,15 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
       <p class="text-cream/70 leading-relaxed">{successBody}</p>
     </div>
 
+    <div id="already-registered-message" class="hidden text-center py-8">
+      <div class="text-4xl mb-4">{t.successEmoji}</div>
+      <h3 class="text-cream font-display text-2xl mb-3">{t.alreadyRegisteredTitle}</h3>
+      <p class="text-cream/70 leading-relaxed" set:html={t.alreadyRegisteredBody.replace(
+        'hei@gg-gels.no',
+        '<a href="mailto:hei@gg-gels.no" class="underline">hei@gg-gels.no</a>'
+      )} />
+    </div>
+
     <div id="error-message" class="hidden mt-4 p-4 border border-red-400/30 bg-red-400/10">
       <p class="text-red-300 text-sm" set:html={t.errorBody.replace(
         'hei@gg-gels.no',
@@ -184,10 +193,11 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
   </div>
 </section>
 
-<script define:vars={{ submitLabel: t.submitLabel, submittingLabel: t.submittingLabel, locale }}>
+<script is:inline define:vars={{ submitLabel: t.submitLabel, submittingLabel: t.submittingLabel, locale }}>
   const form = document.getElementById('waitlist-form');
   const submitBtn = document.getElementById('submit-btn');
   const successMsg = document.getElementById('success-message');
+  const alreadyRegisteredMsg = document.getElementById('already-registered-message');
   const errorMsg = document.getElementById('error-message');
 
   const attributionOtherWrapper = document.getElementById('attribution-other-wrapper');
@@ -267,6 +277,14 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
         if (response.ok) {
           form.classList.add('hidden');
           successMsg.classList.remove('hidden');
+        } else if (response.status === 409) {
+          const body = await response.json().catch(() => ({}));
+          if (body?.error === 'already_registered' && alreadyRegisteredMsg) {
+            form.classList.add('hidden');
+            alreadyRegisteredMsg.classList.remove('hidden');
+          } else {
+            throw new Error('Server error');
+          }
         } else {
           throw new Error('Server error');
         }

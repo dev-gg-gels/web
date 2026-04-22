@@ -28,6 +28,8 @@ const jsonResponse = (data: unknown, status = 200) =>
 
 const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
+class DuplicateEmailError extends Error {}
+
 async function verifyTurnstile(token: string, secret: string, ip: string | null) {
   const body = new URLSearchParams({ secret, response: token });
   if (ip) body.append('remoteip', ip);
@@ -75,6 +77,14 @@ async function insertSupabase(
 
   if (!res.ok) {
     const text = await res.text();
+    try {
+      const parsed = JSON.parse(text) as { code?: string };
+      if (parsed?.code === '23505') {
+        throw new DuplicateEmailError();
+      }
+    } catch (e) {
+      if (e instanceof DuplicateEmailError) throw e;
+    }
     throw new Error(`Supabase insert failed: ${res.status} ${text}`);
   }
 }
@@ -253,6 +263,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   try {
     await insertSupabase(env, payload, environment);
   } catch (err) {
+    if (err instanceof DuplicateEmailError) {
+      return jsonResponse({ error: 'already_registered' }, 409);
+    }
     console.error(err);
     return jsonResponse({ error: 'storage_failed' }, 500);
   }

@@ -88,10 +88,10 @@ const productSchema = {
     <meta name="twitter:image:alt" content="GG-Gels – energy gel for golf" />
 
     <!-- Structured data -->
-    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
-    <script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(productSchema)} />
     {faqSchema && (
-      <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
     )}
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
