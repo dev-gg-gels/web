@@ -9,6 +9,9 @@
 		"directory": "./dist",
 		"binding": "ASSETS"
 	},
+	"vars": {
+		"RESEND_FROM_EMAIL": "GG-Gels <hei@gg-gels.no>"
+	},
 	"observability": {
 		"enabled": true
 	}
