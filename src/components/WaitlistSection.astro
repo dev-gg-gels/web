@@ -138,6 +138,22 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
         />
       </div>
 
+      <div>
+        <label class="flex items-start gap-3 text-cream/80 text-sm cursor-pointer">
+          <input
+            type="checkbox"
+            id="consent"
+            name="consent"
+            required
+            class="mt-1 accent-tee shrink-0"
+          />
+          <span set:html={t.consentLabelHtml} />
+        </label>
+        <p id="consent-error" class="hidden mt-2 text-red-300 text-xs">
+          {t.consentRequiredError}
+        </p>
+      </div>
+
       <div class="flex justify-center">
         <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="dark"></div>
       </div>
@@ -201,6 +217,17 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
 
       const data = new FormData(form);
 
+      const consentInput = /** @type {HTMLInputElement | null} */ (
+        document.getElementById('consent')
+      );
+      const consentError = document.getElementById('consent-error');
+      if (!consentInput?.checked) {
+        consentError?.classList.remove('hidden');
+        consentInput?.focus();
+        return;
+      }
+      consentError?.classList.add('hidden');
+
       if (data.get('attribution') === 'other' && !String(data.get('attributionOther') || '').trim()) {
         attributionOtherInput?.focus();
         return;
@@ -231,6 +258,7 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
             attribution: data.get('attribution'),
             attributionOther: data.get('attributionOther'),
             club: data.get('club'),
+            consent: true,
             turnstileToken,
           }),
         });

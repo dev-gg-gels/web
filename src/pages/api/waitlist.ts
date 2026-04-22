@@ -12,6 +12,7 @@ interface WaitlistPayload {
   attribution: string;
   attributionOther: string;
   club: string;
+  consent: boolean;
   turnstileToken: string;
 }
 
@@ -128,6 +129,10 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
 
   if (!payload.email || !isValidEmail(payload.email)) {
     return jsonResponse({ error: 'invalid_email' }, 400);
+  }
+
+  if (payload.consent !== true) {
+    return jsonResponse({ error: 'consent_required' }, 400);
   }
 
   if (!payload.turnstileToken) {

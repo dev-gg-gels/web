@@ -1,0 +1,220 @@
+---
+export const prerender = true;
+
+import Layout from '../layouts/Layout.astro';
+import Footer from '../components/Footer.astro';
+
+const title = 'Personvernerklæring | GG-Gels';
+const description =
+  'Hvordan GG-Gels behandler personopplysninger fra ventelisten i tråd med GDPR og norsk personvernlovgivning.';
+
+const lastUpdated = '22. april 2026';
+---
+
+<Layout title={title} description={description}>
+  <main class="bg-parchment text-ink">
+    <article class="max-w-3xl mx-auto px-6 py-20 md:py-28">
+      <header class="mb-12">
+        <p class="text-sm tracking-[0.2em] uppercase text-ink/60 mb-3">Personvern</p>
+        <h1 class="font-display text-4xl md:text-5xl leading-tight mb-4">Personvernerklæring</h1>
+        <p class="text-ink/60 text-sm">Sist oppdatert: {lastUpdated}</p>
+      </header>
+
+      <div class="prose prose-ink max-w-none space-y-10 leading-relaxed">
+        <section>
+          <p>
+            Denne personvernerklæringen beskriver hvordan GG-Gels samler inn og behandler
+            personopplysninger fra deg som melder deg på ventelisten på gg-gels.no. Vi
+            behandler opplysninger i samsvar med personopplysningsloven og EUs
+            personvernforordning (GDPR).
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">1. Behandlingsansvarlig</h2>
+          <p>
+            Behandlingsansvarlig er Markus Remmen som privatperson. GG-Gels er et
+            prosjektnavn under etablering.
+          </p>
+          <ul class="list-disc pl-6 mt-3 space-y-1">
+            <li>Navn: Markus Remmen</li>
+            <li>Adresse: Oslo, Norge</li>
+            <li>Kontakt: <a class="underline" href="mailto:hei@gg-gels.no">hei@gg-gels.no</a></li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">2. Hvilke opplysninger vi behandler</h2>
+          <p>Når du melder deg på ventelisten, lagrer vi følgende opplysninger:</p>
+          <ul class="list-disc pl-6 mt-3 space-y-1">
+            <li>E-postadresse (obligatorisk)</li>
+            <li>Handicap-nivå</li>
+            <li>Hvor ofte du spiller golf</li>
+            <li>Om du bruker sportsgel eller ernæring på runden i dag</li>
+            <li>Hva som er viktig for deg ved valg av sportsgel</li>
+            <li>Hva du kunne tenke deg å betale for en 4-pakke</li>
+            <li>Hvordan du hørte om GG-Gels</li>
+            <li>Hvilken golfklubb du spiller i (valgfritt)</li>
+            <li>Tidspunkt for påmelding</li>
+          </ul>
+          <p class="mt-3">
+            I tillegg sender nettleseren din IP-adressen din til Cloudflare Turnstile
+            utelukkende for bot-verifisering i det øyeblikket skjemaet sendes inn. IP-adressen
+            lagres ikke av oss.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">3. Formål og rettslig grunnlag</h2>
+          <p>Vi behandler opplysningene dine for følgende formål:</p>
+          <ul class="list-disc pl-6 mt-3 space-y-1">
+            <li>
+              Sende deg e-post med informasjon om produktlansering, early bird-rabatt og
+              viktige oppdateringer om GG-Gels.
+            </li>
+            <li>
+              Analysere aggregert etterspørsel for å validere konseptet før lansering
+              (f.eks. fordeling av handicap, betalingsvilje og attribusjon).
+            </li>
+            <li>Beskytte skjemaet mot misbruk (bot-verifisering via Cloudflare Turnstile).</li>
+          </ul>
+          <p class="mt-3">
+            Det rettslige grunnlaget for behandlingen er ditt samtykke, jf. GDPR artikkel 6
+            nr. 1 bokstav a. Du kan når som helst trekke tilbake samtykket ditt ved å melde
+            deg av (se punkt 7).
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">4. Databehandlere</h2>
+          <p>
+            Vi bruker følgende underleverandører (databehandlere) som behandler opplysninger
+            på våre vegne under databehandleravtale:
+          </p>
+          <ul class="list-disc pl-6 mt-3 space-y-2">
+            <li>
+              <strong>Supabase</strong> — database for venteliste-registreringer.
+              <a
+                class="underline"
+                href="https://supabase.com/privacy"
+                target="_blank"
+                rel="noopener noreferrer">supabase.com/privacy</a
+              >
+            </li>
+            <li>
+              <strong>Resend</strong> — utsendelse av bekreftelses- og oppdateringse-poster.
+              <a
+                class="underline"
+                href="https://resend.com/legal/privacy-policy"
+                target="_blank"
+                rel="noopener noreferrer">resend.com/legal/privacy-policy</a
+              >
+            </li>
+            <li>
+              <strong>Cloudflare</strong> — hosting av nettsiden og bot-beskyttelse
+              (Turnstile).
+              <a
+                class="underline"
+                href="https://www.cloudflare.com/privacypolicy/"
+                target="_blank"
+                rel="noopener noreferrer">cloudflare.com/privacypolicy</a
+              >
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">5. Overføring til land utenfor EØS</h2>
+          <p>
+            Enkelte av våre databehandlere er etablert i USA (Resend, Cloudflare).
+            Overføringen skjer på grunnlag av EU-kommisjonens beslutning om tilstrekkelig
+            beskyttelsesnivå under EU–US Data Privacy Framework og/eller standard
+            personvernbestemmelser (Standard Contractual Clauses) vedtatt av
+            EU-kommisjonen. Databasen (Supabase) driftes i EU-region.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">6. Lagringstid</h2>
+          <p>
+            Vi lagrer opplysningene dine frem til vi enten har gjennomført produktlansering
+            eller besluttet å ikke lansere produktet – senest til 30. juni 2027. Dersom du
+            melder deg av ventelisten før det, slettes opplysningene dine uten ugrunnet
+            opphold.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">7. Dine rettigheter</h2>
+          <p>Så lenge vi behandler personopplysninger om deg, har du rett til å:</p>
+          <ul class="list-disc pl-6 mt-3 space-y-1">
+            <li>Be om innsyn i hvilke opplysninger vi har om deg</li>
+            <li>Be om retting av uriktige opplysninger</li>
+            <li>Be om sletting av opplysningene dine</li>
+            <li>Be om begrensning av behandlingen</li>
+            <li>Motsette deg behandlingen</li>
+            <li>Be om dataportabilitet (å få opplysningene utlevert i et maskinlesbart format)</li>
+            <li>Trekke tilbake samtykket ditt når som helst</li>
+          </ul>
+          <p class="mt-3">
+            Du kan bruke rettighetene dine ved å sende en e-post til
+            <a class="underline" href="mailto:hei@gg-gels.no">hei@gg-gels.no</a>. Vi svarer
+            innen 30 dager.
+          </p>
+          <p class="mt-3">
+            Du har også rett til å klage på behandlingen til Datatilsynet. Se
+            <a
+              class="underline"
+              href="https://www.datatilsynet.no/om-personvern/klage-til-datatilsynet/"
+              target="_blank"
+              rel="noopener noreferrer">datatilsynet.no</a
+            > for mer informasjon.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">8. Informasjonskapsler (cookies)</h2>
+          <p>
+            Nettsiden setter i dag <strong>ingen informasjonskapsler</strong>. Vi bruker
+            heller ingen sporings- eller analyseverktøy som krever samtykke. Dersom dette
+            endrer seg i fremtiden, vil du bli bedt om å gi aktivt samtykke før slike
+            tjenester tas i bruk, og denne erklæringen vil bli oppdatert.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">9. Sikkerhet</h2>
+          <p>
+            Opplysningene overføres kryptert (HTTPS/TLS) og lagres bak tilgangskontroll hos
+            våre databehandlere. Kun de som trenger tilgang for å drifte ventelisten har
+            tilgang til opplysningene.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">10. Endringer</h2>
+          <p>
+            Vi kan oppdatere denne erklæringen. Gjeldende versjon vil til enhver tid være
+            tilgjengelig på denne siden, og vesentlige endringer vil bli varslet på e-post
+            til de som står på ventelisten.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">11. Kontakt</h2>
+          <p>
+            Spørsmål om denne erklæringen eller behandlingen av dine opplysninger kan sendes
+            til <a class="underline" href="mailto:hei@gg-gels.no">hei@gg-gels.no</a>.
+          </p>
+        </section>
+      </div>
+
+      <div class="mt-16 pt-8 border-t border-ink/10">
+        <a href="/" class="text-sm text-ink/60 underline hover:text-ink transition-colors">
+          ← Tilbake til forsiden
+        </a>
+      </div>
+    </article>
+  </main>
+  <Footer />
+</Layout>

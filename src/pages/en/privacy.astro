@@ -1,0 +1,218 @@
+---
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import Footer from '../../components/Footer.astro';
+
+const title = 'Privacy Policy | GG-Gels';
+const description =
+  'How GG-Gels processes personal data from the waitlist in compliance with the GDPR and Norwegian data protection law.';
+
+const lastUpdated = '22 April 2026';
+---
+
+<Layout title={title} description={description}>
+  <main class="bg-parchment text-ink">
+    <article class="max-w-3xl mx-auto px-6 py-20 md:py-28">
+      <header class="mb-12">
+        <p class="text-sm tracking-[0.2em] uppercase text-ink/60 mb-3">Privacy</p>
+        <h1 class="font-display text-4xl md:text-5xl leading-tight mb-4">Privacy Policy</h1>
+        <p class="text-ink/60 text-sm">Last updated: {lastUpdated}</p>
+      </header>
+
+      <div class="prose prose-ink max-w-none space-y-10 leading-relaxed">
+        <section>
+          <p>
+            This privacy policy describes how GG-Gels collects and processes personal data
+            from people who sign up to the waitlist on gg-gels.no. We process personal data
+            in accordance with the Norwegian Personal Data Act and the EU General Data
+            Protection Regulation (GDPR).
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">1. Data controller</h2>
+          <p>
+            The data controller is Markus Remmen as a private individual. GG-Gels is a
+            project name pending incorporation.
+          </p>
+          <ul class="list-disc pl-6 mt-3 space-y-1">
+            <li>Name: Markus Remmen</li>
+            <li>Address: Oslo, Norway</li>
+            <li>Contact: <a class="underline" href="mailto:hei@gg-gels.no">hei@gg-gels.no</a></li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">2. What data we process</h2>
+          <p>When you sign up to the waitlist, we store the following data:</p>
+          <ul class="list-disc pl-6 mt-3 space-y-1">
+            <li>Email address (required)</li>
+            <li>Handicap level</li>
+            <li>How often you play golf</li>
+            <li>Whether you currently use sports gels or nutrition during your round</li>
+            <li>What matters to you when picking a sports gel</li>
+            <li>What you would be willing to pay for a 4-pack</li>
+            <li>How you heard about GG-Gels</li>
+            <li>Which golf club you play at (optional)</li>
+            <li>Timestamp of your signup</li>
+          </ul>
+          <p class="mt-3">
+            In addition, your browser sends your IP address to Cloudflare Turnstile solely
+            for bot verification at the moment the form is submitted. The IP address is not
+            stored by us.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">3. Purposes and legal basis</h2>
+          <p>We process your data for the following purposes:</p>
+          <ul class="list-disc pl-6 mt-3 space-y-1">
+            <li>
+              Sending you email with information about the product launch, early bird
+              discount and important updates about GG-Gels.
+            </li>
+            <li>
+              Analysing aggregate demand to validate the concept before launch (e.g.
+              distribution of handicap, willingness to pay, and attribution).
+            </li>
+            <li>Protecting the form from abuse (bot verification via Cloudflare Turnstile).</li>
+          </ul>
+          <p class="mt-3">
+            The legal basis for processing is your consent, cf. GDPR Article 6(1)(a). You
+            may withdraw your consent at any time by unsubscribing (see section 7).
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">4. Data processors</h2>
+          <p>
+            We use the following sub-processors to process data on our behalf under a data
+            processing agreement:
+          </p>
+          <ul class="list-disc pl-6 mt-3 space-y-2">
+            <li>
+              <strong>Supabase</strong> — database for waitlist registrations.
+              <a
+                class="underline"
+                href="https://supabase.com/privacy"
+                target="_blank"
+                rel="noopener noreferrer">supabase.com/privacy</a
+              >
+            </li>
+            <li>
+              <strong>Resend</strong> — sending confirmation and update emails.
+              <a
+                class="underline"
+                href="https://resend.com/legal/privacy-policy"
+                target="_blank"
+                rel="noopener noreferrer">resend.com/legal/privacy-policy</a
+              >
+            </li>
+            <li>
+              <strong>Cloudflare</strong> — website hosting and bot protection (Turnstile).
+              <a
+                class="underline"
+                href="https://www.cloudflare.com/privacypolicy/"
+                target="_blank"
+                rel="noopener noreferrer">cloudflare.com/privacypolicy</a
+              >
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">5. Transfers outside the EEA</h2>
+          <p>
+            Some of our processors are established in the United States (Resend,
+            Cloudflare). Transfers take place on the basis of the European Commission's
+            adequacy decision under the EU–US Data Privacy Framework and/or the Standard
+            Contractual Clauses adopted by the Commission. The database (Supabase) runs in
+            an EU region.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">6. Retention period</h2>
+          <p>
+            We retain your data until we either launch the product or decide not to launch
+            it – at the latest until 30 June 2027. If you unsubscribe from the waitlist
+            before then, your data is deleted without undue delay.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">7. Your rights</h2>
+          <p>For as long as we process personal data about you, you have the right to:</p>
+          <ul class="list-disc pl-6 mt-3 space-y-1">
+            <li>Request access to the data we hold about you</li>
+            <li>Request correction of inaccurate data</li>
+            <li>Request deletion of your data</li>
+            <li>Request restriction of processing</li>
+            <li>Object to the processing</li>
+            <li>Request data portability (to receive your data in a machine-readable format)</li>
+            <li>Withdraw your consent at any time</li>
+          </ul>
+          <p class="mt-3">
+            You can exercise your rights by emailing
+            <a class="underline" href="mailto:hei@gg-gels.no">hei@gg-gels.no</a>. We will
+            respond within 30 days.
+          </p>
+          <p class="mt-3">
+            You also have the right to lodge a complaint about the processing with the
+            Norwegian Data Protection Authority (Datatilsynet). See
+            <a
+              class="underline"
+              href="https://www.datatilsynet.no/en/"
+              target="_blank"
+              rel="noopener noreferrer">datatilsynet.no</a
+            > for more information.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">8. Cookies</h2>
+          <p>
+            This website currently sets <strong>no cookies</strong>. We also use no tracking
+            or analytics tools that would require consent. If this changes in the future,
+            you will be asked to give active consent before any such services are enabled,
+            and this policy will be updated.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">9. Security</h2>
+          <p>
+            Data is transmitted encrypted (HTTPS/TLS) and stored behind access controls
+            with our processors. Only those who need access to operate the waitlist have
+            access to the data.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">10. Changes</h2>
+          <p>
+            We may update this policy. The current version will always be available on this
+            page, and material changes will be communicated by email to people on the
+            waitlist.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="font-display text-2xl mb-3">11. Contact</h2>
+          <p>
+            Questions about this policy or the processing of your data can be sent to
+            <a class="underline" href="mailto:hei@gg-gels.no">hei@gg-gels.no</a>.
+          </p>
+        </section>
+      </div>
+
+      <div class="mt-16 pt-8 border-t border-ink/10">
+        <a href="/en/" class="text-sm text-ink/60 underline hover:text-ink transition-colors">
+          ← Back to home
+        </a>
+      </div>
+    </article>
+  </main>
+  <Footer />
+</Layout>
