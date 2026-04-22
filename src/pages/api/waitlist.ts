@@ -5,19 +5,65 @@ export const prerender = false;
 
 type Locale = 'nb' | 'en';
 
+const HANDICAP_VALUES = ['0-5', '6-12', '13-20', '21-30', 'over-30'] as const;
+const FREQUENCY_VALUES = [
+  'a-few-times-a-season',
+  'once-a-week',
+  'twice-a-week',
+  '3-plus-times-a-week',
+] as const;
+const CURRENT_SOLUTION_VALUES = [
+  'sports-gels-regularly',
+  'tried-not-a-habit',
+  'food-and-snacks',
+  'nothing',
+] as const;
+const PRIORITY_VALUES = [
+  'steady-energy-and-focus',
+  'good-taste',
+  'price',
+  'clean-ingredients',
+] as const;
+const PRICE_VALUES = ['under-200', '200-249', '250-299', '300-or-more', 'not-sure'] as const;
+const ATTRIBUTION_VALUES = [
+  'instagram-or-facebook',
+  'google-search',
+  'friend-or-club-recommendation',
+  'golf-magazine-podcast-or-newsletter',
+  'other',
+] as const;
+
+const ATTRIBUTION_OTHER_MAX = 200;
+const CLUB_MAX = 100;
+
 interface WaitlistPayload {
+  email?: unknown;
+  handicap?: unknown;
+  frequency?: unknown;
+  currentSolution?: unknown;
+  priorities?: unknown;
+  priceWillingness?: unknown;
+  attribution?: unknown;
+  attributionOther?: unknown;
+  club?: unknown;
+  consent?: unknown;
+  locale?: unknown;
+  turnstileToken?: unknown;
+}
+
+interface WaitlistRow {
   email: string;
-  handicap: string;
-  frequency: string;
-  currentSolution: string;
+  handicap: string | null;
+  frequency: string | null;
+  currentSolution: string | null;
   priorities: string[];
-  priceWillingness: string;
-  attribution: string;
-  attributionOther: string;
-  club: string;
-  consent: boolean;
+  priceWillingness: string | null;
+  attribution: string | null;
+  attributionOther: string | null;
+  club: string | null;
   locale: Locale;
-  turnstileToken: string;
+  consentAt: string;
+  environment: 'production' | 'test';
 }
 
 const jsonResponse = (data: unknown, status = 200) =>
@@ -27,6 +73,30 @@ const jsonResponse = (data: unknown, status = 200) =>
   });
 
 const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
+function pickEnum<T extends string>(value: unknown, allowed: readonly T[]): T | null {
+  return typeof value === 'string' && (allowed as readonly string[]).includes(value)
+    ? (value as T)
+    : null;
+}
+
+function pickEnumArray<T extends string>(value: unknown, allowed: readonly T[]): T[] {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set<T>();
+  for (const item of value) {
+    if (typeof item === 'string' && (allowed as readonly string[]).includes(item)) {
+      seen.add(item as T);
+    }
+  }
+  return Array.from(seen);
+}
+
+function clampString(value: unknown, max: number): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  return trimmed.length > max ? trimmed.slice(0, max) : trimmed;
+}
 
 class DuplicateEmailError extends Error {}
 
@@ -44,13 +114,8 @@ async function verifyTurnstile(token: string, secret: string, ip: string | null)
 
 async function insertSupabase(
   env: Pick<Cloudflare.Env, 'SUPABASE_URL' | 'SUPABASE_SERVICE_ROLE_KEY'>,
-  payload: Omit<WaitlistPayload, 'turnstileToken'>,
-  environment: 'production' | 'test',
+  row: WaitlistRow,
 ) {
-  const priorities = Array.isArray(payload.priorities)
-    ? payload.priorities.filter((p): p is string => typeof p === 'string').slice(0, 10)
-    : [];
-
   const res = await fetch(`${env.SUPABASE_URL}/rest/v1/waitlist`, {
     method: 'POST',
     headers: {
@@ -60,18 +125,18 @@ async function insertSupabase(
       Prefer: 'return=minimal',
     },
     body: JSON.stringify({
-      email: payload.email,
-      handicap: payload.handicap || null,
-      frequency: payload.frequency || null,
-      current_solution: payload.currentSolution || null,
-      priorities: priorities.length ? priorities : null,
-      price_willingness: payload.priceWillingness || null,
-      attribution: payload.attribution || null,
-      attribution_other:
-        payload.attribution === 'other' ? payload.attributionOther?.trim() || null : null,
-      club: payload.club?.trim() || null,
-      locale: payload.locale,
-      environment,
+      email: row.email,
+      handicap: row.handicap,
+      frequency: row.frequency,
+      current_solution: row.currentSolution,
+      priorities: row.priorities.length ? row.priorities : null,
+      price_willingness: row.priceWillingness,
+      attribution: row.attribution,
+      attribution_other: row.attribution === 'other' ? row.attributionOther : null,
+      club: row.club,
+      locale: row.locale,
+      consent_at: row.consentAt,
+      environment: row.environment,
     }),
   });
 
@@ -91,26 +156,32 @@ async function insertSupabase(
 
 const emailContent: Record<Locale, { subject: string; html: string; text: string; unsubscribeSubject: string }> = {
   nb: {
-    subject: 'Du er inne ⛳ — 20% rabatt er sikret',
+    subject: 'Du er med ⛳ — 20 % lanseringsrabatt er sikret',
     unsubscribeSubject: 'Avmeld',
     html: `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 24px; color: #1F1E1A; background: #F5F1E8;">
-        <h1 style="font-size: 28px; line-height: 1.2; margin: 0 0 24px;">Du er inne ⛳</h1>
+        <h1 style="font-size: 28px; line-height: 1.2; margin: 0 0 24px;">Du er med ⛳</h1>
         <p style="font-size: 17px; line-height: 1.6; margin: 0 0 20px;">
-          Takk for at du meldte deg på ventelisten for GG-Gels. Det betyr mye at du tror på prosjektet før vi har brygget den første produksjonsbatchen.
+          Takk for at du meldte deg på ventelisten for GG-Gels — et system med fire energigels laget for golfens fire faser, fra første tee til siste putt.
+        </p>
+        <p style="font-size: 17px; line-height: 1.6; margin: 0 0 20px;">
+          Det betyr mye at du tror på prosjektet før første batch er produsert.
         </p>
         <div style="background: #ffffff; border-left: 3px solid #C9E265; padding: 20px 24px; margin: 28px 0;">
           <p style="font-size: 15px; line-height: 1.6; margin: 0 0 8px; font-weight: 600;">Det du akkurat sikret deg:</p>
           <ul style="font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px; color: #1F1E1A;">
-            <li>20% early bird-rabatt ved lansering</li>
+            <li>20 % lanseringsrabatt</li>
             <li>Tilgang før alle andre</li>
-            <li>Mulighet til å forme produktet — vi kommer til å spørre ventelisten om smaks- og pakningsvalg</li>
+            <li>Stemmerett på smak og pakning — vi spør ventelisten først</li>
           </ul>
         </div>
         <p style="font-size: 17px; line-height: 1.6; margin: 0 0 20px;">
-          Vi sikter mot lansering til golfsesongen 2026. Frem til da dukker vi opp med oppdateringer kun når det er noe å si — ingen nyhetsbrev-støy.
+          Vi sikter mot lansering til golfsesongen 2026. Neste livstegn kommer når vi har noe ekte å si — ingen nyhetsbrev-støy.
         </p>
-        <p style="font-size: 17px; line-height: 1.6; margin: 0 0 8px;">Ha en skarp runde.</p>
+        <p style="font-size: 17px; line-height: 1.6; margin: 0 0 20px;">
+          Kjenner du noen som spiller mye? Send dem <a href="https://gg-gels.no" style="color: #1F1E1A;">gg-gels.no</a> — de får plass foran i køen.
+        </p>
+        <p style="font-size: 17px; line-height: 1.6; margin: 0 0 8px;">Sees på banen.</p>
         <p style="font-size: 17px; line-height: 1.6; margin: 0 0 32px;">— Markus</p>
         <hr style="border: none; border-top: 1px solid #D9D4C7; margin: 32px 0;" />
         <p style="font-size: 13px; line-height: 1.6; color: #6B675E; margin: 0;">
@@ -120,18 +191,22 @@ const emailContent: Record<Locale, { subject: string; html: string; text: string
         </p>
       </div>
     `,
-    text: `Du er inne ⛳
+    text: `Du er med ⛳
 
-Takk for at du meldte deg på ventelisten for GG-Gels. Det betyr mye at du tror på prosjektet før vi har brygget den første produksjonsbatchen.
+Takk for at du meldte deg på ventelisten for GG-Gels — et system med fire energigels laget for golfens fire faser, fra første tee til siste putt.
+
+Det betyr mye at du tror på prosjektet før første batch er produsert.
 
 Det du akkurat sikret deg:
-• 20% early bird-rabatt ved lansering
+• 20 % lanseringsrabatt
 • Tilgang før alle andre
-• Mulighet til å forme produktet — vi kommer til å spørre ventelisten om smaks- og pakningsvalg
+• Stemmerett på smak og pakning — vi spør ventelisten først
 
-Vi sikter mot lansering til golfsesongen 2026. Frem til da dukker vi opp med oppdateringer kun når det er noe å si — ingen nyhetsbrev-støy.
+Vi sikter mot lansering til golfsesongen 2026. Neste livstegn kommer når vi har noe ekte å si — ingen nyhetsbrev-støy.
 
-Ha en skarp runde.
+Kjenner du noen som spiller mye? Send dem gg-gels.no — de får plass foran i køen.
+
+Sees på banen.
 — Markus
 
 ---
@@ -140,26 +215,32 @@ Vil du melde deg av? Svar på denne e-posten, eller skriv til hei@gg-gels.no med
 Personvern: https://gg-gels.no/personvern`,
   },
   en: {
-    subject: "You're in ⛳ — your 20% early bird is locked in",
+    subject: "You're in ⛳ — your 20% launch discount is locked in",
     unsubscribeSubject: 'Unsubscribe',
     html: `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 24px; color: #1F1E1A; background: #F5F1E8;">
         <h1 style="font-size: 28px; line-height: 1.2; margin: 0 0 24px;">You're in ⛳</h1>
         <p style="font-size: 17px; line-height: 1.6; margin: 0 0 20px;">
-          Thanks for joining the GG-Gels waitlist. It means a lot that you're backing this before we've even brewed the first production batch.
+          Thanks for joining the GG-Gels waitlist — a system of four energy gels built for golf's four phases, from the first tee to the final putt.
+        </p>
+        <p style="font-size: 17px; line-height: 1.6; margin: 0 0 20px;">
+          It means a lot that you're backing this before the first batch is even produced.
         </p>
         <div style="background: #ffffff; border-left: 3px solid #C9E265; padding: 20px 24px; margin: 28px 0;">
           <p style="font-size: 15px; line-height: 1.6; margin: 0 0 8px; font-weight: 600;">What you just secured:</p>
           <ul style="font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px; color: #1F1E1A;">
-            <li>20% early bird discount at launch</li>
+            <li>20% launch discount</li>
             <li>First access, before anyone else</li>
-            <li>A say in how the product turns out — we'll ask the waitlist about flavours and pack choices</li>
+            <li>A vote on flavours and pack choices — we'll ask the waitlist first</li>
           </ul>
         </div>
         <p style="font-size: 17px; line-height: 1.6; margin: 0 0 20px;">
-          We're aiming for the 2026 golf season. Until then we'll only show up with updates when there's something actually worth saying — no newsletter noise.
+          We're aiming for the 2026 golf season. The next update lands when we have something real to say — no newsletter noise.
         </p>
-        <p style="font-size: 17px; line-height: 1.6; margin: 0 0 8px;">Play a sharp round out there.</p>
+        <p style="font-size: 17px; line-height: 1.6; margin: 0 0 20px;">
+          Know someone who plays a lot? Send them <a href="https://gg-gels.no/en" style="color: #1F1E1A;">gg-gels.no</a> — they'll jump the queue.
+        </p>
+        <p style="font-size: 17px; line-height: 1.6; margin: 0 0 8px;">See you on the course.</p>
         <p style="font-size: 17px; line-height: 1.6; margin: 0 0 32px;">— Markus</p>
         <hr style="border: none; border-top: 1px solid #D9D4C7; margin: 32px 0;" />
         <p style="font-size: 13px; line-height: 1.6; color: #6B675E; margin: 0;">
@@ -171,16 +252,20 @@ Personvern: https://gg-gels.no/personvern`,
     `,
     text: `You're in ⛳
 
-Thanks for joining the GG-Gels waitlist. It means a lot that you're backing this before we've even brewed the first production batch.
+Thanks for joining the GG-Gels waitlist — a system of four energy gels built for golf's four phases, from the first tee to the final putt.
+
+It means a lot that you're backing this before the first batch is even produced.
 
 What you just secured:
-• 20% early bird discount at launch
+• 20% launch discount
 • First access, before anyone else
-• A say in how the product turns out — we'll ask the waitlist about flavours and pack choices
+• A vote on flavours and pack choices — we'll ask the waitlist first
 
-We're aiming for the 2026 golf season. Until then we'll only show up with updates when there's something actually worth saying — no newsletter noise.
+We're aiming for the 2026 golf season. The next update lands when we have something real to say — no newsletter noise.
 
-Play a sharp round out there.
+Know someone who plays a lot? Send them gg-gels.no — they'll jump the queue.
+
+See you on the course.
 — Markus
 
 ---
@@ -232,7 +317,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return jsonResponse({ error: 'invalid_json' }, 400);
   }
 
-  if (!payload.email || !isValidEmail(payload.email)) {
+  const email =
+    typeof payload.email === 'string' ? payload.email.trim().toLowerCase() : '';
+  if (!email || !isValidEmail(email)) {
     return jsonResponse({ error: 'invalid_email' }, 400);
   }
 
@@ -240,7 +327,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return jsonResponse({ error: 'consent_required' }, 400);
   }
 
-  if (!payload.turnstileToken) {
+  if (typeof payload.turnstileToken !== 'string' || !payload.turnstileToken) {
     return jsonResponse({ error: 'missing_turnstile_token' }, 400);
   }
 
@@ -258,10 +345,28 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     hostname === 'gg-gels.no' || hostname === 'www.gg-gels.no' ? 'production' : 'test';
 
   const locale: Locale = payload.locale === 'en' ? 'en' : 'nb';
-  payload.locale = locale;
+  const attribution = pickEnum(payload.attribution, ATTRIBUTION_VALUES);
+
+  const row: WaitlistRow = {
+    email,
+    handicap: pickEnum(payload.handicap, HANDICAP_VALUES),
+    frequency: pickEnum(payload.frequency, FREQUENCY_VALUES),
+    currentSolution: pickEnum(payload.currentSolution, CURRENT_SOLUTION_VALUES),
+    priorities: pickEnumArray(payload.priorities, PRIORITY_VALUES),
+    priceWillingness: pickEnum(payload.priceWillingness, PRICE_VALUES),
+    attribution,
+    attributionOther:
+      attribution === 'other'
+        ? clampString(payload.attributionOther, ATTRIBUTION_OTHER_MAX)
+        : null,
+    club: clampString(payload.club, CLUB_MAX),
+    locale,
+    consentAt: new Date().toISOString(),
+    environment,
+  };
 
   try {
-    await insertSupabase(env, payload, environment);
+    await insertSupabase(env, row);
   } catch (err) {
     if (err instanceof DuplicateEmailError) {
       return jsonResponse({ error: 'already_registered' }, 409);
@@ -271,7 +376,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   }
 
   try {
-    await sendConfirmationEmail(env, payload.email, locale);
+    await sendConfirmationEmail(env, email, locale);
   } catch (err) {
     // Email failure is non-fatal — the signup succeeded.
     console.error(err);

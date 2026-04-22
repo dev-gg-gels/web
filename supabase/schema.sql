@@ -1,4 +1,9 @@
--- Waitlist table
+-- Waitlist table.
+-- Column order mirrors the submission form: metadata first, then form-facing
+-- fields in the order the user sees them, then server-set metadata.
+--
+-- Stored values always match the English answer text (slugified) so a DB row
+-- is self-explanatory without looking up a label mapping.
 create table if not exists public.waitlist (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
@@ -11,21 +16,11 @@ create table if not exists public.waitlist (
   attribution text,
   attribution_other text,
   club text,
+  consent_at timestamptz not null default now(),
+  locale text not null default 'nb',
   environment text not null default 'test',
   constraint waitlist_email_unique unique (email)
 );
-
-alter table public.waitlist
-  add column if not exists environment text not null default 'test';
-alter table public.waitlist add column if not exists current_solution text;
-alter table public.waitlist add column if not exists price_willingness text;
-alter table public.waitlist add column if not exists attribution text;
-alter table public.waitlist add column if not exists club text;
-alter table public.waitlist add column if not exists priorities text[];
-alter table public.waitlist add column if not exists attribution_other text;
-alter table public.waitlist add column if not exists locale text not null default 'nb';
-
-alter table public.waitlist drop column if exists pain_point;
 
 -- Row Level Security: lock down the table so only the service role can touch it.
 -- The API route uses the service role key server-side (bypasses RLS), so RLS stays on

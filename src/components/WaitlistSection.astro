@@ -277,11 +277,13 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
         if (response.ok) {
           form.classList.add('hidden');
           successMsg.classList.remove('hidden');
+          successMsg.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else if (response.status === 409) {
           const body = await response.json().catch(() => ({}));
           if (body?.error === 'already_registered' && alreadyRegisteredMsg) {
             form.classList.add('hidden');
             alreadyRegisteredMsg.classList.remove('hidden');
+            alreadyRegisteredMsg.scrollIntoView({ behavior: 'smooth', block: 'start' });
           } else {
             throw new Error('Server error');
           }
