@@ -119,6 +119,7 @@ export const translations = {
       eyebrow: 'Tidlig tilgang',
       title: 'Bli blant de første {max}',
       body: 'Meld deg på ventelisten nå og få {discount} rabatt ved lansering, pluss eksklusiv informasjon om produktet før alle andre.',
+      requiredHint: 'Felt markert med * er obligatorisk.',
       emailLabel: 'E-postadresse',
       emailPlaceholder: 'din@epost.no',
       handicapLegend: 'Hva er handicapet ditt?',
@@ -177,6 +178,8 @@ export const translations = {
       consentLabelHtml:
         'Jeg samtykker til at GG-Gels lagrer svarene mine og sender meg e-post om produktet. Se <a href="/personvern" class="underline hover:text-cream">personvernerklæringen</a>.',
       consentRequiredError: 'Du må samtykke til personvernerklæringen for å melde deg på.',
+      requiredFieldError: 'Velg et alternativ.',
+      requiredPrioritiesError: 'Velg minst ett alternativ.',
       privacyNote: 'Ingen spam. Kun viktige oppdateringer om GG-Gels. Meld deg av når som helst.',
       successEmoji: '⛳',
       successTitle: 'Du er med på listen!',
@@ -363,6 +366,7 @@ export const translations = {
       eyebrow: 'Early bird access',
       title: 'Be among the first {max}',
       body: 'Join the waitlist now and get {discount} off at launch, plus exclusive information about the product before anyone else.',
+      requiredHint: 'Fields marked with * are required.',
       emailLabel: 'Email address',
       emailPlaceholder: 'your@email.com',
       handicapLegend: 'What is your handicap?',
@@ -421,6 +425,8 @@ export const translations = {
       consentLabelHtml:
         'I consent to GG-Gels storing my answers and emailing me about the product. See the <a href="/en/privacy" class="underline hover:text-cream">privacy policy</a>.',
       consentRequiredError: 'You must agree to the privacy policy to join the waitlist.',
+      requiredFieldError: 'Please select an option.',
+      requiredPrioritiesError: 'Please select at least one option.',
       privacyNote: 'No spam. Only important updates about GG-Gels. Unsubscribe anytime.',
       successEmoji: '⛳',
       successTitle: 'You\'re on the list!',

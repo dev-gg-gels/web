@@ -20,7 +20,8 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
   <div class="max-w-2xl mx-auto px-6 text-center">
     <p class="text-tee text-sm tracking-[0.2em] uppercase mb-4">{t.eyebrow}</p>
     <h2 class="text-cream font-display text-3xl md:text-4xl leading-snug mb-4">{sectionTitle}</h2>
-    <p class="text-cream/70 text-lg leading-relaxed mb-10">{sectionBody}</p>
+    <p class="text-cream/70 text-lg leading-relaxed mb-6">{sectionBody}</p>
+    <p class="text-cream/50 text-sm mb-10">{t.requiredHint}</p>
 
     <form id="waitlist-form" class="text-left space-y-5" novalidate>
       <div>
@@ -35,10 +36,11 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
           placeholder={t.emailPlaceholder}
           class="w-full bg-cream/10 border border-cream/20 text-cream placeholder-cream/30 px-4 py-3 focus:outline-none focus:border-tee focus-visible:ring-2 focus-visible:ring-tee transition-colors duration-200"
         />
+        <p id="email-error" class="hidden mt-2 text-red-300 text-xs">{t.requiredFieldError}</p>
       </div>
 
       <fieldset>
-        <legend class="text-cream/80 text-sm mb-3">{t.handicapLegend}</legend>
+        <legend class="text-cream/80 text-sm mb-3">{t.handicapLegend} <span class="text-tee">*</span></legend>
         <div class="grid grid-cols-2 gap-2">
           {t.handicapOptions.map(({ value, label }) => (
             <label class="flex items-center gap-3 border border-cream/20 px-4 py-3 cursor-pointer hover:border-cream/40 transition-colors has-[:checked]:border-tee has-[:checked]:bg-tee/10">
@@ -47,10 +49,11 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
             </label>
           ))}
         </div>
+        <p id="handicap-error" class="hidden mt-2 text-red-300 text-xs">{t.requiredFieldError}</p>
       </fieldset>
 
       <fieldset>
-        <legend class="text-cream/80 text-sm mb-3">{t.frequencyLegend}</legend>
+        <legend class="text-cream/80 text-sm mb-3">{t.frequencyLegend} <span class="text-tee">*</span></legend>
         <div class="grid grid-cols-2 gap-2">
           {t.frequencyOptions.map(({ value, label }) => (
             <label class="flex items-center gap-3 border border-cream/20 px-4 py-3 cursor-pointer hover:border-cream/40 transition-colors has-[:checked]:border-tee has-[:checked]:bg-tee/10">
@@ -59,10 +62,11 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
             </label>
           ))}
         </div>
+        <p id="frequency-error" class="hidden mt-2 text-red-300 text-xs">{t.requiredFieldError}</p>
       </fieldset>
 
       <fieldset>
-        <legend class="text-cream/80 text-sm mb-3">{t.currentSolutionLegend}</legend>
+        <legend class="text-cream/80 text-sm mb-3">{t.currentSolutionLegend} <span class="text-tee">*</span></legend>
         <div class="grid grid-cols-2 gap-2">
           {t.currentSolutionOptions.map(({ value, label }) => (
             <label class="flex items-center gap-3 border border-cream/20 px-4 py-3 cursor-pointer hover:border-cream/40 transition-colors has-[:checked]:border-tee has-[:checked]:bg-tee/10">
@@ -71,11 +75,12 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
             </label>
           ))}
         </div>
+        <p id="currentSolution-error" class="hidden mt-2 text-red-300 text-xs">{t.requiredFieldError}</p>
       </fieldset>
 
       <fieldset>
         <legend class="text-cream/80 text-sm mb-3">
-          {t.prioritiesLegend} <span class="text-cream/40">({t.prioritiesHint})</span>
+          {t.prioritiesLegend} <span class="text-tee">*</span> <span class="text-cream/40">({t.prioritiesHint})</span>
         </legend>
         <div class="grid grid-cols-2 gap-2">
           {t.prioritiesOptions.map(({ value, label }) => (
@@ -85,10 +90,11 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
             </label>
           ))}
         </div>
+        <p id="priorities-error" class="hidden mt-2 text-red-300 text-xs">{t.requiredPrioritiesError}</p>
       </fieldset>
 
       <fieldset>
-        <legend class="text-cream/80 text-sm mb-3">{t.priceLegend}</legend>
+        <legend class="text-cream/80 text-sm mb-3">{t.priceLegend} <span class="text-tee">*</span></legend>
         <div class="grid grid-cols-2 gap-2">
           {t.priceOptions.map(({ value, label }) => (
             <label class="flex items-center gap-3 border border-cream/20 px-4 py-3 cursor-pointer hover:border-cream/40 transition-colors has-[:checked]:border-tee has-[:checked]:bg-tee/10">
@@ -97,10 +103,11 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
             </label>
           ))}
         </div>
+        <p id="priceWillingness-error" class="hidden mt-2 text-red-300 text-xs">{t.requiredFieldError}</p>
       </fieldset>
 
       <fieldset>
-        <legend class="text-cream/80 text-sm mb-3">{t.attributionLegend}</legend>
+        <legend class="text-cream/80 text-sm mb-3">{t.attributionLegend} <span class="text-tee">*</span></legend>
         <div class="grid grid-cols-2 gap-2">
           {t.attributionOptions.map(({ value, label }) => (
             <label class="flex items-center gap-3 border border-cream/20 px-4 py-3 cursor-pointer hover:border-cream/40 transition-colors has-[:checked]:border-tee has-[:checked]:bg-tee/10">
@@ -109,6 +116,7 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
             </label>
           ))}
         </div>
+        <p id="attribution-error" class="hidden mt-2 text-red-300 text-xs">{t.requiredFieldError}</p>
         <div id="attribution-other-wrapper" class="hidden mt-3">
           <label for="attribution-other" class="block text-cream/80 text-sm mb-2">
             {t.attributionOtherLabel} <span class="text-tee">*</span>
@@ -121,6 +129,7 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
             placeholder={t.attributionOtherPlaceholder}
             class="w-full bg-cream/10 border border-cream/20 text-cream placeholder-cream/30 px-4 py-3 focus:outline-none focus:border-tee focus-visible:ring-2 focus-visible:ring-tee transition-colors duration-200"
           />
+          <p id="attributionOther-error" class="hidden mt-2 text-red-300 text-xs">{t.requiredFieldError}</p>
         </div>
       </fieldset>
 
@@ -147,7 +156,7 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
             required
             class="mt-1 accent-tee shrink-0"
           />
-          <span set:html={t.consentLabelHtml} />
+          <span><span set:html={t.consentLabelHtml} /> <span class="text-tee">*</span></span>
         </label>
         <p id="consent-error" class="hidden mt-2 text-red-300 text-xs">
           {t.consentRequiredError}
@@ -212,20 +221,54 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
       const isOther = checked?.value === 'other';
       attributionOtherWrapper?.classList.toggle('hidden', !isOther);
       if (!isOther && attributionOtherInput) attributionOtherInput.value = '';
+      if (!isOther) document.getElementById('attributionOther-error')?.classList.add('hidden');
     });
   });
+
+  const requiredRadios = ['handicap', 'frequency', 'currentSolution', 'priceWillingness', 'attribution'];
+  const showError = (id) => document.getElementById(`${id}-error`)?.classList.remove('hidden');
+  const hideError = (id) => document.getElementById(`${id}-error`)?.classList.add('hidden');
+
+  requiredRadios.forEach((name) => {
+    document.querySelectorAll(`input[name="${name}"]`).forEach((input) => {
+      input.addEventListener('change', () => hideError(name));
+    });
+  });
+  document.querySelectorAll('input[name="priorities"]').forEach((input) => {
+    input.addEventListener('change', () => hideError('priorities'));
+  });
+  document.getElementById('email')?.addEventListener('input', () => hideError('email'));
+  attributionOtherInput?.addEventListener('input', () => hideError('attributionOther'));
 
   if (form && submitBtn && successMsg && errorMsg) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
+      const data = new FormData(form);
+      let firstInvalid = null;
+
       const emailInput = /** @type {HTMLInputElement} */ (document.getElementById('email'));
       if (!emailInput?.value || !emailInput.validity.valid) {
-        emailInput?.focus();
-        return;
+        showError('email');
+        firstInvalid = firstInvalid || emailInput;
       }
 
-      const data = new FormData(form);
+      for (const name of requiredRadios) {
+        if (!data.get(name)) {
+          showError(name);
+          firstInvalid = firstInvalid || document.querySelector(`input[name="${name}"]`);
+        }
+      }
+
+      if (data.getAll('priorities').length === 0) {
+        showError('priorities');
+        firstInvalid = firstInvalid || document.querySelector('input[name="priorities"]');
+      }
+
+      if (data.get('attribution') === 'other' && !String(data.get('attributionOther') || '').trim()) {
+        showError('attributionOther');
+        firstInvalid = firstInvalid || attributionOtherInput;
+      }
 
       const consentInput = /** @type {HTMLInputElement | null} */ (
         document.getElementById('consent')
@@ -233,13 +276,14 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
       const consentError = document.getElementById('consent-error');
       if (!consentInput?.checked) {
         consentError?.classList.remove('hidden');
-        consentInput?.focus();
-        return;
+        firstInvalid = firstInvalid || consentInput;
+      } else {
+        consentError?.classList.add('hidden');
       }
-      consentError?.classList.add('hidden');
 
-      if (data.get('attribution') === 'other' && !String(data.get('attributionOther') || '').trim()) {
-        attributionOtherInput?.focus();
+      if (firstInvalid) {
+        /** @type {HTMLElement} */ (firstInvalid).focus?.();
+        /** @type {HTMLElement} */ (firstInvalid).scrollIntoView?.({ behavior: 'smooth', block: 'center' });
         return;
       }
 

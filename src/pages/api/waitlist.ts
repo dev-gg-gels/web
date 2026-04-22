@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { env as runtimeEnv } from 'cloudflare:workers';
+import { z } from 'zod';
 
 export const prerender = false;
 
@@ -36,29 +37,45 @@ const ATTRIBUTION_VALUES = [
 const ATTRIBUTION_OTHER_MAX = 200;
 const CLUB_MAX = 100;
 
-interface WaitlistPayload {
-  email?: unknown;
-  handicap?: unknown;
-  frequency?: unknown;
-  currentSolution?: unknown;
-  priorities?: unknown;
-  priceWillingness?: unknown;
-  attribution?: unknown;
-  attributionOther?: unknown;
-  club?: unknown;
-  consent?: unknown;
-  locale?: unknown;
-  turnstileToken?: unknown;
-}
+const waitlistSchema = z
+  .object({
+    email: z
+      .string()
+      .trim()
+      .toLowerCase()
+      .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/),
+    handicap: z.enum(HANDICAP_VALUES),
+    frequency: z.enum(FREQUENCY_VALUES),
+    currentSolution: z.enum(CURRENT_SOLUTION_VALUES),
+    priorities: z.array(z.enum(PRIORITY_VALUES)).min(1),
+    priceWillingness: z.enum(PRICE_VALUES),
+    attribution: z.enum(ATTRIBUTION_VALUES),
+    attributionOther: z.string().max(ATTRIBUTION_OTHER_MAX).optional().nullable(),
+    club: z.string().max(CLUB_MAX).optional().nullable(),
+    consent: z.literal(true),
+    locale: z.enum(['nb', 'en']),
+    turnstileToken: z.string().min(1),
+  })
+  .superRefine((data, ctx) => {
+    if (data.attribution === 'other' && !data.attributionOther?.trim()) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['attributionOther'],
+        message: 'required',
+      });
+    }
+  });
+
+type WaitlistInput = z.infer<typeof waitlistSchema>;
 
 interface WaitlistRow {
   email: string;
-  handicap: string | null;
-  frequency: string | null;
-  currentSolution: string | null;
-  priorities: string[];
-  priceWillingness: string | null;
-  attribution: string | null;
+  handicap: WaitlistInput['handicap'];
+  frequency: WaitlistInput['frequency'];
+  currentSolution: WaitlistInput['currentSolution'];
+  priorities: WaitlistInput['priorities'];
+  priceWillingness: WaitlistInput['priceWillingness'];
+  attribution: WaitlistInput['attribution'];
   attributionOther: string | null;
   club: string | null;
   locale: Locale;
@@ -71,32 +88,6 @@ const jsonResponse = (data: unknown, status = 200) =>
     status,
     headers: { 'Content-Type': 'application/json' },
   });
-
-const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-
-function pickEnum<T extends string>(value: unknown, allowed: readonly T[]): T | null {
-  return typeof value === 'string' && (allowed as readonly string[]).includes(value)
-    ? (value as T)
-    : null;
-}
-
-function pickEnumArray<T extends string>(value: unknown, allowed: readonly T[]): T[] {
-  if (!Array.isArray(value)) return [];
-  const seen = new Set<T>();
-  for (const item of value) {
-    if (typeof item === 'string' && (allowed as readonly string[]).includes(item)) {
-      seen.add(item as T);
-    }
-  }
-  return Array.from(seen);
-}
-
-function clampString(value: unknown, max: number): string | null {
-  if (typeof value !== 'string') return null;
-  const trimmed = value.trim();
-  if (!trimmed) return null;
-  return trimmed.length > max ? trimmed.slice(0, max) : trimmed;
-}
 
 class DuplicateEmailError extends Error {}
 
@@ -310,29 +301,24 @@ async function sendConfirmationEmail(
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   const env = runtimeEnv;
 
-  let payload: WaitlistPayload;
+  let rawPayload: unknown;
   try {
-    payload = (await request.json()) as WaitlistPayload;
+    rawPayload = await request.json();
   } catch {
     return jsonResponse({ error: 'invalid_json' }, 400);
   }
 
-  const email =
-    typeof payload.email === 'string' ? payload.email.trim().toLowerCase() : '';
-  if (!email || !isValidEmail(email)) {
-    return jsonResponse({ error: 'invalid_email' }, 400);
+  const parsed = waitlistSchema.safeParse(rawPayload);
+  if (!parsed.success) {
+    return jsonResponse(
+      { error: 'validation_failed', issues: parsed.error.issues },
+      400,
+    );
   }
-
-  if (payload.consent !== true) {
-    return jsonResponse({ error: 'consent_required' }, 400);
-  }
-
-  if (typeof payload.turnstileToken !== 'string' || !payload.turnstileToken) {
-    return jsonResponse({ error: 'missing_turnstile_token' }, 400);
-  }
+  const data = parsed.data;
 
   const turnstileOk = await verifyTurnstile(
-    payload.turnstileToken,
+    data.turnstileToken,
     env.TURNSTILE_SECRET_KEY,
     clientAddress ?? null,
   );
@@ -344,23 +330,21 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   const environment: 'production' | 'test' =
     hostname === 'gg-gels.no' || hostname === 'www.gg-gels.no' ? 'production' : 'test';
 
-  const locale: Locale = payload.locale === 'en' ? 'en' : 'nb';
-  const attribution = pickEnum(payload.attribution, ATTRIBUTION_VALUES);
+  const clubTrimmed = data.club?.trim() || null;
+  const attributionOtherTrimmed =
+    data.attribution === 'other' ? data.attributionOther?.trim() || null : null;
 
   const row: WaitlistRow = {
-    email,
-    handicap: pickEnum(payload.handicap, HANDICAP_VALUES),
-    frequency: pickEnum(payload.frequency, FREQUENCY_VALUES),
-    currentSolution: pickEnum(payload.currentSolution, CURRENT_SOLUTION_VALUES),
-    priorities: pickEnumArray(payload.priorities, PRIORITY_VALUES),
-    priceWillingness: pickEnum(payload.priceWillingness, PRICE_VALUES),
-    attribution,
-    attributionOther:
-      attribution === 'other'
-        ? clampString(payload.attributionOther, ATTRIBUTION_OTHER_MAX)
-        : null,
-    club: clampString(payload.club, CLUB_MAX),
-    locale,
+    email: data.email,
+    handicap: data.handicap,
+    frequency: data.frequency,
+    currentSolution: data.currentSolution,
+    priorities: data.priorities,
+    priceWillingness: data.priceWillingness,
+    attribution: data.attribution,
+    attributionOther: attributionOtherTrimmed,
+    club: clubTrimmed,
+    locale: data.locale,
     consentAt: new Date().toISOString(),
     environment,
   };
@@ -376,7 +360,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   }
 
   try {
-    await sendConfirmationEmail(env, email, locale);
+    await sendConfirmationEmail(env, data.email, data.locale);
   } catch (err) {
     // Email failure is non-fatal — the signup succeeded.
     console.error(err);
