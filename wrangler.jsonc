@@ -27,6 +27,7 @@
 	// Sensitive verdier (API-nøkler, service role keys) skal settes via `wrangler secret put`,
 	// ikke her. Lokale verdier i `.dev.vars` (gitignored).
 	"vars": {
+		"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAADBOwJZfe4yY-5LR",
 		"RESEND_FROM_EMAIL": "GG-Gels <hei@gg-gels.no>"
 	},
 
