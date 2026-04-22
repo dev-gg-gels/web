@@ -1,4 +1,5 @@
 ---
+import { env } from 'cloudflare:workers';
 import { waitlistConfig } from '../config/waitlist';
 import { getT } from '../i18n/utils';
 import type { Locale } from '../i18n/translations';
@@ -7,7 +8,7 @@ const locale = (Astro.currentLocale ?? 'nb') as Locale;
 const t = getT(locale).waitlist;
 const { earlyBirdDiscount, maxEarlyBird } = waitlistConfig;
 
-const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? '';
+const turnstileSiteKey = env.PUBLIC_TURNSTILE_SITE_KEY ?? '';
 
 const sectionTitle = t.title.replace('{max}', String(maxEarlyBird));
 const sectionBody = t.body.replace('{discount}', earlyBirdDiscount);
