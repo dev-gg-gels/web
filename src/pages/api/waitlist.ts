@@ -6,7 +6,7 @@ export const prerender = false;
 
 type Locale = 'nb' | 'en';
 
-const HANDICAP_VALUES = ['0-5', '6-12', '13-20', '21-30', 'over-30'] as const;
+const HANDICAP_VALUES = ['under-0', '0-10', '11-20', '21-plus'] as const;
 const FREQUENCY_VALUES = [
   'a-few-times-a-season',
   'once-a-week',

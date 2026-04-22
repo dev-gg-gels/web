@@ -124,11 +124,10 @@ export const translations = {
       emailPlaceholder: 'din@epost.no',
       handicapLegend: 'Hva er handicapet ditt?',
       handicapOptions: [
-        { value: '0-5', label: '0–5' },
-        { value: '6-12', label: '6–12' },
-        { value: '13-20', label: '13–20' },
-        { value: '21-30', label: '21–30' },
-        { value: 'over-30', label: '30+' },
+        { value: 'under-0', label: '−1 eller lavere' },
+        { value: '0-10', label: '0–10' },
+        { value: '11-20', label: '11–20' },
+        { value: '21-plus', label: '21 eller høyere' },
       ],
       frequencyLegend: 'Hvor ofte spiller du?',
       frequencyOptions: [
@@ -371,11 +370,10 @@ export const translations = {
       emailPlaceholder: 'your@email.com',
       handicapLegend: 'What is your handicap?',
       handicapOptions: [
-        { value: '0-5', label: '0–5' },
-        { value: '6-12', label: '6–12' },
-        { value: '13-20', label: '13–20' },
-        { value: '21-30', label: '21–30' },
-        { value: 'over-30', label: '30+' },
+        { value: 'under-0', label: '−1 or lower' },
+        { value: '0-10', label: '0–10' },
+        { value: '11-20', label: '11–20' },
+        { value: '21-plus', label: '21 or higher' },
       ],
       frequencyLegend: 'How often do you play?',
       frequencyOptions: [
