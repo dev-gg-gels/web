@@ -15,9 +15,12 @@ Landingsside for GG-Gels med venteliste-innmelding. Astro 6 (SSR) på Cloudflare
 
 1. Bruker fyller ut `WaitlistSection.astro` → POST til `/api/waitlist`
 2. API-ruten [src/pages/api/waitlist.ts](src/pages/api/waitlist.ts) kjører på Cloudflare Worker og:
+   - Validerer e-post og at samtykke-checkboksen er huket av (`consent === true`)
    - Verifiserer Turnstile-token
-   - Skriver raden til Supabase via REST (service role key)
-   - Sender bekreftelses-e-post via Resend (feiler stille — innmeldingen er uansett lagret)
+   - Skriver raden til Supabase via REST (service role key), inkludert `locale` (`nb` / `en`) for senere språk-riktig kommunikasjon
+   - Sender lokalisert bekreftelses-e-post via Resend (feiler stille — innmeldingen er uansett lagret)
+
+Personvernerklæring ligger på [`/personvern`](src/pages/personvern.astro) og [`/en/privacy`](src/pages/en/privacy.astro), lenket fra footer og fra samtykke-checkboksen.
 
 ## Kommandoer
 
@@ -27,7 +30,8 @@ Landingsside for GG-Gels med venteliste-innmelding. Astro 6 (SSR) på Cloudflare
 | `pnpm dev` | Dev-server på `localhost:4321` |
 | `pnpm build` | Bygg til `./dist/` |
 | `pnpm preview` | Preview bygget lokalt |
-| `pnpm generate-types` | Generer Cloudflare bindings-typer |
+| `pnpm deploy` | Build + deploy til Cloudflare i én kommando |
+| `pnpm generate-types` | Generer Cloudflare bindings-typer manuelt (kalles automatisk av `dev`/`build`) |
 
 ## Førstegangs-oppsett
 
@@ -55,41 +59,62 @@ Service role brukes kun server-side i Worker-en. RLS er aktivert, så anon-key h
 2. Site key → `PUBLIC_TURNSTILE_SITE_KEY`
 3. Secret key → `TURNSTILE_SECRET_KEY`
 
-### 4. Lokal `.env`
+### 4. Lokal konfig — `.env` og `.dev.vars`
 
-Kopier `.env.example` til `.env` og fyll inn alle verdier. Se `.env.example` for hele listen.
+To filer trengs lokalt (begge er gitignored):
+
+- **`.env`** — brukes av Astro/Vite ved build/dev for `PUBLIC_*`-variabler (f.eks. `PUBLIC_TURNSTILE_SITE_KEY`) som inlines i klient-bundlen.
+- **`.dev.vars`** — Wrangler-konvensjon, brukes av `@astrojs/cloudflare` i dev slik at API-ruten får tilgang til Worker-secrets via `import { env } from "cloudflare:workers"`. Uten denne returnerer `/api/waitlist` 500 på localhost.
+
+Enkleste oppsett:
+
+```sh
+cp .env.example .env
+cp .env .dev.vars
+```
+
+Fyll inn verdier i begge. For Turnstile lokalt er det praktisk å bytte til Cloudflares ["always-pass"-testnøkler](https://developers.cloudflare.com/turnstile/troubleshooting/testing/) i `.dev.vars` slik at du ikke trenger å hviteliste localhost i produksjons-widgeten:
+
+```
+PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+```
+
+Lokale signups havner automatisk med `environment = 'test'` i Supabase (jf. hostname-sjekk i [waitlist.ts](src/pages/api/waitlist.ts)), så de blander seg ikke med produksjonsdata. Rydd dem med `delete from public.waitlist where environment = 'test';`.
 
 ## Deploy
 
-### Bygg
+### One-shot
 
 ```sh
-pnpm build
+pnpm deploy
 ```
 
-Dette genererer både statiske assets og Worker-entrypointet (`@astrojs/cloudflare`).
+Dette bygger (`astro build`) og deployer Worker-en til Cloudflare i én kommando. Hvis build feiler, avbrytes deployen.
 
-### Sett secrets på Worker-en
+### Sett secrets på Worker-en (én gang)
 
-Secrets skal **ikke** ligge i `wrangler.jsonc` eller i repo. Sett dem via Wrangler:
+Secrets skal **ikke** ligge i `wrangler.jsonc` eller i repo — de er gitignored via `.dev.vars`. Sett dem via Wrangler:
 
 ```sh
 pnpm wrangler secret put SUPABASE_URL
 pnpm wrangler secret put SUPABASE_SERVICE_ROLE_KEY
 pnpm wrangler secret put RESEND_API_KEY
-pnpm wrangler secret put RESEND_FROM_EMAIL
 pnpm wrangler secret put TURNSTILE_SECRET_KEY
 ```
 
-`PUBLIC_TURNSTILE_SITE_KEY` inlines i klient-bundlen ved build-tid og må derfor ligge i build-miljøet (lokal `.env` ved `pnpm build`, eller env var i Cloudflare Pages/CI dersom du bygger i skyen).
+`RESEND_FROM_EMAIL` ligger som public var i [wrangler.jsonc](wrangler.jsonc).
 
-### Deploy Worker
+`PUBLIC_TURNSTILE_SITE_KEY` inlines i klient-bundlen ved build-tid og må derfor ligge i build-miljøet (lokal `.env` ved `pnpm build`, eller env var i CI dersom du bygger i skyen).
+
+Verifiser med:
 
 ```sh
-pnpm wrangler deploy
+pnpm wrangler secret list
+pnpm wrangler tail     # live Worker-logger
 ```
 
-Worker-navn og entrypoint er satt i [wrangler.jsonc](wrangler.jsonc).
+Worker-navn og entrypoint er satt i [wrangler.jsonc](wrangler.jsonc). `worker-configuration.d.ts` er auto-generert (og gitignored) — `dev` og `build` regenererer den som første steg.
 
 ## Konfigurasjon
 

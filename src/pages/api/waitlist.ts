@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { env as runtimeEnv } from 'cloudflare:workers';
 
 export const prerender = false;
 
@@ -17,14 +18,6 @@ interface WaitlistPayload {
   consent: boolean;
   locale: Locale;
   turnstileToken: string;
-}
-
-interface Env {
-  SUPABASE_URL: string;
-  SUPABASE_SERVICE_ROLE_KEY: string;
-  RESEND_API_KEY: string;
-  RESEND_FROM_EMAIL: string;
-  TURNSTILE_SECRET_KEY: string;
 }
 
 const jsonResponse = (data: unknown, status = 200) =>
@@ -48,7 +41,7 @@ async function verifyTurnstile(token: string, secret: string, ip: string | null)
 }
 
 async function insertSupabase(
-  env: Pick<Env, 'SUPABASE_URL' | 'SUPABASE_SERVICE_ROLE_KEY'>,
+  env: Pick<Cloudflare.Env, 'SUPABASE_URL' | 'SUPABASE_SERVICE_ROLE_KEY'>,
   payload: Omit<WaitlistPayload, 'turnstileToken'>,
   environment: 'production' | 'test',
 ) {
@@ -188,7 +181,7 @@ Privacy: https://gg-gels.no/en/privacy`,
 };
 
 async function sendConfirmationEmail(
-  env: Pick<Env, 'RESEND_API_KEY' | 'RESEND_FROM_EMAIL'>,
+  env: Pick<Cloudflare.Env, 'RESEND_API_KEY' | 'RESEND_FROM_EMAIL'>,
   email: string,
   locale: Locale,
 ) {
@@ -219,8 +212,8 @@ async function sendConfirmationEmail(
   }
 }
 
-export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
-  const env = (locals as unknown as { runtime: { env: Env } }).runtime.env;
+export const POST: APIRoute = async ({ request, clientAddress }) => {
+  const env = runtimeEnv;
 
   let payload: WaitlistPayload;
   try {

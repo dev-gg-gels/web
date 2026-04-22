@@ -1,17 +1,36 @@
 {
+	// Workers runtime-versjon. Oppdateres med jevne mellomrom (eks. ved nye workerd-features).
+	// Se https://developers.cloudflare.com/workers/configuration/compatibility-dates/.
+	// Runtime-typene regenereres automatisk som første steg i `pnpm dev` og `pnpm build`.
 	"compatibility_date": "2026-04-21",
+
+	// global_fetch_strictly_public: fetch() kan kun snakke med offentlige internett-adresser
+	// fra Worker-en — blokkerer utilsiktet tilgang til private/interne IP-er. Anbefalt default.
 	"compatibility_flags": [
 		"global_fetch_strictly_public"
 	],
+
+	// Worker-navnet i Cloudflare-dashbordet. Endres du dette, mister du også tidligere satte secrets.
 	"name": "gg-gels-web",
+
+	// Astro's Cloudflare-adapter genererer entrypointet. Ikke endre.
 	"main": "@astrojs/cloudflare/entrypoints/server",
+
+	// Statiske assets fra `astro build` serveres av Workers Static Assets.
+	// directory MÅ matche astro's output-mappe (`./dist/`).
 	"assets": {
 		"directory": "./dist",
 		"binding": "ASSETS"
 	},
+
+	// Public vars — committed til git og synlig i Cloudflare-dashbordet.
+	// Sensitive verdier (API-nøkler, service role keys) skal settes via `wrangler secret put`,
+	// ikke her. Lokale verdier i `.dev.vars` (gitignored).
 	"vars": {
 		"RESEND_FROM_EMAIL": "GG-Gels <hei@gg-gels.no>"
 	},
+
+	// Workers Logs — aktiverer strukturerte logger i dashbordet + `wrangler tail`.
 	"observability": {
 		"enabled": true
 	}
