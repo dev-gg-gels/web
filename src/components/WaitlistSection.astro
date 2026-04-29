@@ -80,18 +80,29 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
       </fieldset>
 
       <fieldset>
-        <legend class="text-cream/80 text-sm mb-3">
-          {t.prioritiesLegend} <span class="text-tee">*</span> <span class="text-cream/40">({t.prioritiesHint})</span>
-        </legend>
-        <div class="grid grid-cols-2 gap-2">
-          {t.prioritiesOptions.map(({ value, label }) => (
+        <legend class="text-cream/80 text-sm mb-3">{t.painPointLegend} <span class="text-tee">*</span></legend>
+        <div class="grid grid-cols-1 gap-2">
+          {t.painPointOptions.map(({ value, label }) => (
             <label class="flex items-center gap-3 border border-cream/20 px-4 py-3 cursor-pointer hover:border-cream/40 transition-colors has-[:checked]:border-tee has-[:checked]:bg-tee/10">
-              <input type="checkbox" name="priorities" value={value} class="accent-tee" />
+              <input type="radio" name="painPoint" value={value} class="accent-tee" />
               <span class="text-cream/80 text-sm">{label}</span>
             </label>
           ))}
         </div>
-        <p id="priorities-error" class="hidden mt-2 text-red-300 text-xs">{t.requiredPrioritiesError}</p>
+        <p id="painPoint-error" class="hidden mt-2 text-red-300 text-xs">{t.requiredFieldError}</p>
+      </fieldset>
+
+      <fieldset>
+        <legend class="text-cream/80 text-sm mb-3">{t.gelInterestLegend} <span class="text-tee">*</span></legend>
+        <div class="grid grid-cols-1 gap-2">
+          {t.gelInterestOptions.map(({ value, label }) => (
+            <label class="flex items-center gap-3 border border-cream/20 px-4 py-3 cursor-pointer hover:border-cream/40 transition-colors has-[:checked]:border-tee has-[:checked]:bg-tee/10">
+              <input type="radio" name="gelInterest" value={value} class="accent-tee" />
+              <span class="text-cream/80 text-sm">{label}</span>
+            </label>
+          ))}
+        </div>
+        <p id="gelInterest-error" class="hidden mt-2 text-red-300 text-xs">{t.requiredFieldError}</p>
       </fieldset>
 
       <fieldset>
@@ -105,6 +116,19 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
           ))}
         </div>
         <p id="priceWillingness-error" class="hidden mt-2 text-red-300 text-xs">{t.requiredFieldError}</p>
+      </fieldset>
+
+      <fieldset>
+        <legend class="text-cream/80 text-sm mb-3">{t.purchaseIntentLegend} <span class="text-tee">*</span></legend>
+        <div class="grid grid-cols-1 gap-2">
+          {t.purchaseIntentOptions.map(({ value, label }) => (
+            <label class="flex items-center gap-3 border border-cream/20 px-4 py-3 cursor-pointer hover:border-cream/40 transition-colors has-[:checked]:border-tee has-[:checked]:bg-tee/10">
+              <input type="radio" name="purchaseIntent" value={value} class="accent-tee" />
+              <span class="text-cream/80 text-sm">{label}</span>
+            </label>
+          ))}
+        </div>
+        <p id="purchaseIntent-error" class="hidden mt-2 text-red-300 text-xs">{t.requiredFieldError}</p>
       </fieldset>
 
       <fieldset>
@@ -146,6 +170,20 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
           placeholder={t.clubPlaceholder}
           class="w-full bg-cream/10 border border-cream/20 text-cream placeholder-cream/30 px-4 py-3 focus:outline-none focus:border-tee focus-visible:ring-2 focus-visible:ring-tee transition-colors duration-200"
         />
+      </div>
+
+      <div>
+        <label for="openFeedback" class="block text-cream/80 text-sm mb-2">
+          {t.openFeedbackLabel} <span class="text-cream/40">({t.openFeedbackHint})</span>
+        </label>
+        <textarea
+          id="openFeedback"
+          name="openFeedback"
+          rows="3"
+          maxlength="500"
+          placeholder={t.openFeedbackPlaceholder}
+          class="w-full bg-cream/10 border border-cream/20 text-cream placeholder-cream/30 px-4 py-3 focus:outline-none focus:border-tee focus-visible:ring-2 focus-visible:ring-tee transition-colors duration-200 resize-y"
+        ></textarea>
       </div>
 
       <div>
@@ -226,7 +264,16 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
     });
   });
 
-  const requiredRadios = ['handicap', 'frequency', 'currentSolution', 'priceWillingness', 'attribution'];
+  const requiredRadios = [
+    'handicap',
+    'frequency',
+    'currentSolution',
+    'painPoint',
+    'gelInterest',
+    'priceWillingness',
+    'purchaseIntent',
+    'attribution',
+  ];
   const showError = (id) => document.getElementById(`${id}-error`)?.classList.remove('hidden');
   const hideError = (id) => document.getElementById(`${id}-error`)?.classList.add('hidden');
 
@@ -234,9 +281,6 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
     document.querySelectorAll(`input[name="${name}"]`).forEach((input) => {
       input.addEventListener('change', () => hideError(name));
     });
-  });
-  document.querySelectorAll('input[name="priorities"]').forEach((input) => {
-    input.addEventListener('change', () => hideError('priorities'));
   });
   document.getElementById('email')?.addEventListener('input', () => hideError('email'));
   attributionOtherInput?.addEventListener('input', () => hideError('attributionOther'));
@@ -259,11 +303,6 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
           showError(name);
           firstInvalid = firstInvalid || document.querySelector(`input[name="${name}"]`);
         }
-      }
-
-      if (data.getAll('priorities').length === 0) {
-        showError('priorities');
-        firstInvalid = firstInvalid || document.querySelector('input[name="priorities"]');
       }
 
       if (data.get('attribution') === 'other' && !String(data.get('attributionOther') || '').trim()) {
@@ -308,11 +347,14 @@ const successBody = t.successBody.replace('{discount}', earlyBirdDiscount);
             handicap: data.get('handicap'),
             frequency: data.get('frequency'),
             currentSolution: data.get('currentSolution'),
-            priorities: data.getAll('priorities'),
+            painPoint: data.get('painPoint'),
+            gelInterest: data.get('gelInterest'),
             priceWillingness: data.get('priceWillingness'),
+            purchaseIntent: data.get('purchaseIntent'),
             attribution: data.get('attribution'),
             attributionOther: data.get('attributionOther'),
             club: data.get('club'),
+            openFeedback: data.get('openFeedback'),
             consent: true,
             locale,
             turnstileToken,

@@ -6,9 +6,17 @@ export const prerender = false;
 
 type Locale = 'nb' | 'en';
 
-const HANDICAP_VALUES = ['under-0', '0-10', '11-20', '21-plus'] as const;
+const HANDICAP_VALUES = [
+  'under-12',
+  '12-18',
+  '18-24',
+  '24-36',
+  '36-plus',
+  'not-registered',
+] as const;
 const FREQUENCY_VALUES = [
-  'a-few-times-a-season',
+  'less-than-monthly',
+  'monthly',
   'once-a-week',
   'twice-a-week',
   '3-plus-times-a-week',
@@ -19,13 +27,36 @@ const CURRENT_SOLUTION_VALUES = [
   'food-and-snacks',
   'nothing',
 ] as const;
-const PRIORITY_VALUES = [
-  'steady-energy-and-focus',
-  'good-taste',
-  'price',
-  'clean-ingredients',
+const PAIN_POINT_VALUES = [
+  'energy-crash-back-9',
+  'stomach-issues',
+  'bad-taste',
+  'timing-uncertainty',
+  'no-issue',
 ] as const;
-const PRICE_VALUES = ['under-200', '200-249', '250-299', '300-or-more', 'not-sure'] as const;
+const GEL_INTEREST_VALUES = [
+  'tee-off',
+  'front-9-focus',
+  'back-9-clutch',
+  'finishing-putt',
+  'whole-system',
+  'not-sure',
+] as const;
+const PRICE_VALUES = [
+  'under-150',
+  '150-199',
+  '200-249',
+  '250-299',
+  '300-or-more',
+  'not-sure',
+] as const;
+const PURCHASE_INTENT_VALUES = [
+  'very-likely',
+  'likely-if-fits',
+  'might-after-feedback',
+  'only-on-discount',
+  'not-sure',
+] as const;
 const ATTRIBUTION_VALUES = [
   'instagram-or-facebook',
   'google-search',
@@ -36,6 +67,7 @@ const ATTRIBUTION_VALUES = [
 
 const ATTRIBUTION_OTHER_MAX = 200;
 const CLUB_MAX = 100;
+const OPEN_FEEDBACK_MAX = 500;
 
 const waitlistSchema = z
   .object({
@@ -47,11 +79,14 @@ const waitlistSchema = z
     handicap: z.enum(HANDICAP_VALUES),
     frequency: z.enum(FREQUENCY_VALUES),
     currentSolution: z.enum(CURRENT_SOLUTION_VALUES),
-    priorities: z.array(z.enum(PRIORITY_VALUES)).min(1),
+    painPoint: z.enum(PAIN_POINT_VALUES),
+    gelInterest: z.enum(GEL_INTEREST_VALUES),
     priceWillingness: z.enum(PRICE_VALUES),
+    purchaseIntent: z.enum(PURCHASE_INTENT_VALUES),
     attribution: z.enum(ATTRIBUTION_VALUES),
     attributionOther: z.string().max(ATTRIBUTION_OTHER_MAX).optional().nullable(),
     club: z.string().max(CLUB_MAX).optional().nullable(),
+    openFeedback: z.string().max(OPEN_FEEDBACK_MAX).optional().nullable(),
     consent: z.literal(true),
     locale: z.enum(['nb', 'en']),
     turnstileToken: z.string().min(1).max(2048),
@@ -73,11 +108,14 @@ interface WaitlistRow {
   handicap: WaitlistInput['handicap'];
   frequency: WaitlistInput['frequency'];
   currentSolution: WaitlistInput['currentSolution'];
-  priorities: WaitlistInput['priorities'];
+  painPoint: WaitlistInput['painPoint'];
+  gelInterest: WaitlistInput['gelInterest'];
   priceWillingness: WaitlistInput['priceWillingness'];
+  purchaseIntent: WaitlistInput['purchaseIntent'];
   attribution: WaitlistInput['attribution'];
   attributionOther: string | null;
   club: string | null;
+  openFeedback: string | null;
   locale: Locale;
   consentAt: string;
   environment: 'production' | 'test';
@@ -138,11 +176,14 @@ async function insertSupabase(
       handicap: row.handicap,
       frequency: row.frequency,
       current_solution: row.currentSolution,
-      priorities: row.priorities.length ? row.priorities : null,
+      pain_point: row.painPoint,
+      gel_interest: row.gelInterest,
       price_willingness: row.priceWillingness,
+      purchase_intent: row.purchaseIntent,
       attribution: row.attribution,
       attribution_other: row.attribution === 'other' ? row.attributionOther : null,
       club: row.club,
+      open_feedback: row.openFeedback,
       locale: row.locale,
       consent_at: row.consentAt,
       environment: row.environment,
@@ -358,6 +399,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     hostname === 'gg-gels.no' || hostname === 'www.gg-gels.no' ? 'production' : 'test';
 
   const clubTrimmed = data.club?.trim() || null;
+  const openFeedbackTrimmed = data.openFeedback?.trim() || null;
   const attributionOtherTrimmed =
     data.attribution === 'other' ? data.attributionOther?.trim() || null : null;
 
@@ -366,11 +408,14 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     handicap: data.handicap,
     frequency: data.frequency,
     currentSolution: data.currentSolution,
-    priorities: data.priorities,
+    painPoint: data.painPoint,
+    gelInterest: data.gelInterest,
     priceWillingness: data.priceWillingness,
+    purchaseIntent: data.purchaseIntent,
     attribution: data.attribution,
     attributionOther: attributionOtherTrimmed,
     club: clubTrimmed,
+    openFeedback: openFeedbackTrimmed,
     locale: data.locale,
     consentAt: new Date().toISOString(),
     environment,

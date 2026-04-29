@@ -11,16 +11,27 @@ create table if not exists public.waitlist (
   handicap text,
   frequency text,
   current_solution text,
+  pain_point text,
+  gel_interest text,
   priorities text[],
   price_willingness text,
+  purchase_intent text,
   attribution text,
   attribution_other text,
   club text,
+  open_feedback text,
   consent_at timestamptz not null default now(),
   locale text not null default 'nb',
   environment text not null default 'test',
   constraint waitlist_email_unique unique (email)
 );
+
+-- Migrasjon for eksisterende tabell: legg til kolonnene hvis de mangler.
+-- Trygt å kjøre flere ganger.
+alter table public.waitlist add column if not exists pain_point text;
+alter table public.waitlist add column if not exists gel_interest text;
+alter table public.waitlist add column if not exists purchase_intent text;
+alter table public.waitlist add column if not exists open_feedback text;
 
 -- Row Level Security: lock down the table so only the service role can touch it.
 -- The API route uses the service role key server-side (bypasses RLS), so RLS stays on
